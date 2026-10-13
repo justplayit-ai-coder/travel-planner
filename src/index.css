@@ -59,9 +59,9 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
 
-/* 按鈕共用樣式 */
+/* 按鈕共用樣式 (縮小 10%) */
 .btn {
-  padding: 8px 14px;
+  padding: 5px 9px;
   border-radius: var(--radius-sm);
   border: none;
   font-weight: 500;
@@ -70,8 +70,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  font-size: 0.88rem;
+  gap: 5px;
+  font-size: 0.78rem;
 }
 .btn-primary {
   background: var(--primary);
@@ -104,7 +104,7 @@ body {
   color: var(--text-secondary);
   border: none;
   cursor: pointer;
-  padding: 6px;
+  padding: 4px;
   border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
@@ -224,23 +224,23 @@ body {
   overflow: hidden;
 }
 
-/* 側邊欄 (Sidebar) */
+/* 側邊欄 (Sidebar) - 收窄 20% */
 .sidebar {
-  width: 290px;
+  width: 232px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  margin: 16px 0 16px 16px;
+  margin: 10px 0 10px 10px;
   border-radius: var(--radius-lg);
   transition: width 0.25s ease;
   overflow: hidden;
   z-index: 20;
 }
 .sidebar.collapsed {
-  width: 68px;
+  width: 54px;
 }
 .sidebar-header {
-  padding: 18px 16px;
+  padding: 14px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -418,25 +418,25 @@ body {
   color: var(--danger);
 }
 
-/* 主作業區 (Main Content Zone) */
+/* 主作業區 (Main Content Zone) - Gap 收緊 10% */
 .main-content-zone {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  gap: 16px;
+  padding: 10px 12px;
+  gap: 10px;
   overflow: hidden;
 }
 
 /* ===================================================
-   頂部預算看板 (BudgetDashboard) - 緊湊化版型
+   頂部預算看板 (BudgetDashboard) - 緊湊化並縮小 10%
    =================================================== */
 .budget-dashboard {
-  padding: 10px 16px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 .dashboard-header-row {
@@ -444,25 +444,25 @@ body {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 .trip-meta-inputs {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .trip-title-input {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   background: transparent;
   border: 1px solid transparent;
   border-bottom: 1px solid var(--surface-border);
   color: var(--text-primary);
-  padding: 2px 6px;
+  padding: 2px 5px;
   border-radius: 4px;
   outline: none;
-  min-width: 220px;
+  min-width: 190px;
 }
 .trip-title-input:focus {
   border-color: var(--primary);
@@ -471,18 +471,18 @@ body {
 .rate-badge {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--surface-border);
-  padding: 3px 8px;
+  padding: 2px 6px;
   border-radius: var(--radius-sm);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
 }
 .rate-label {
   color: var(--text-secondary);
 }
 .rate-input {
-  width: 58px;
+  width: 52px;
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--text-muted);
@@ -490,7 +490,7 @@ body {
   font-weight: 600;
   outline: none;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
 }
 .rate-unit {
   color: var(--text-muted);
@@ -498,28 +498,28 @@ body {
 .airfare-quick-input {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--surface-border);
-  padding: 3px 8px;
+  padding: 2px 6px;
   border-radius: var(--radius-sm);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
 }
 .quick-num-input {
-  width: 70px;
+  width: 64px;
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--text-muted);
   color: var(--text-primary);
   font-weight: 600;
   outline: none;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
 }
 .currency-select.mini {
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   cursor: pointer;
   outline: none;
 }
@@ -529,7 +529,7 @@ body {
 .dashboard-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 .active-map {
   background: var(--primary-light) !important;
@@ -537,49 +537,49 @@ body {
   color: #a5b4fc !important;
 }
 
-/* 預算統計卡片群 - 緊湊高質感 */
+/* 預算統計卡片群 - 再縮小 10% */
 .budget-summary-grid {
   display: grid;
-  grid-template-columns: 210px 1fr;
-  gap: 10px;
+  grid-template-columns: 190px 1fr;
+  gap: 8px;
 }
 .total-stat-card {
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(30, 41, 59, 0.4) 100%);
   border: 1px solid rgba(99, 102, 241, 0.3);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 6px 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 .stat-label {
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   color: #cbd5e1;
   font-weight: 500;
 }
 .stat-twd-total {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #38bdf8;
-  margin: 2px 0;
+  margin: 1px 0;
 }
 .stat-foreign-sub {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: var(--text-secondary);
 }
 .category-cards-container {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 .category-stat-card {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
-  padding: 6px 10px;
+  padding: 4px 7px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 .cat-header {
   display: flex;
@@ -589,33 +589,33 @@ body {
 .cat-title-wrap {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 .cat-name {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
 .cat-pct {
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   color: var(--text-muted);
 }
 .cat-twd-val {
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 .cat-foreign-val {
-  font-size: 0.66rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
 }
 .cat-progress-bg {
   width: 100%;
-  height: 3px;
+  height: 2.5px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 2px;
   overflow: hidden;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 .cat-progress-bar {
   height: 100%;
@@ -624,14 +624,14 @@ body {
 }
 
 /* ===================================================
-   分割工作區與地圖視圖 (左右並排，地圖固定不隨捲軸移動)
+   分割工作區與地圖視圖 (地圖放寬 10% 至 530px，固定不隨捲軸移動)
    =================================================== */
 .workspace-split {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: row;
-  gap: 16px;
+  gap: 10px;
   overflow: hidden;
   position: relative;
 }
@@ -643,8 +643,8 @@ body {
   padding-right: 4px;
 }
 .map-view-column {
-  width: 480px;
-  max-width: 38vw;
+  width: 530px;
+  max-width: 44vw;
   flex-shrink: 0;
   height: 100%;
   display: flex;
@@ -654,7 +654,7 @@ body {
   overflow: hidden;
 }
 
-/* Leaflet 地圖樣式 (接近 1:1 或 4:3 比例) */
+/* Leaflet 地圖樣式 */
 .map-panel {
   height: 100%;
   width: 100%;
@@ -663,45 +663,45 @@ body {
   overflow: hidden;
 }
 .map-toolbar {
-  padding: 8px 12px;
+  padding: 6px 10px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--surface-border);
-  gap: 8px;
+  gap: 6px;
 }
 .map-title-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   white-space: nowrap;
 }
 .map-nav-icon {
   color: var(--primary);
 }
 .map-title {
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 600;
 }
 .map-toolbar-right {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
 }
 .map-filters {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   overflow-x: auto;
 }
 .map-filter-chip {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--surface-border);
   color: var(--text-secondary);
-  font-size: 0.7rem;
-  padding: 2px 7px;
-  border-radius: 10px;
+  font-size: 0.68rem;
+  padding: 1px 6px;
+  border-radius: 8px;
   cursor: pointer;
   white-space: nowrap;
   transition: var(--transition);
@@ -718,14 +718,6 @@ body {
   color: var(--danger);
   background: rgba(244, 63, 94, 0.15);
 }
-.map-filter-chip:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-.map-filter-chip.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
 .leaflet-wrapper {
   flex: 1;
   position: relative;
@@ -734,74 +726,77 @@ body {
   color: #1e293b;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 .popup-day-tag {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #6366f1;
   font-weight: 600;
 }
 .popup-name {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 .popup-date {
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   color: #64748b;
 }
 .no-markers-hint {
-  padding: 8px 16px;
-  font-size: 0.78rem;
+  padding: 6px 12px;
+  font-size: 0.74rem;
   color: var(--warning);
   background: rgba(245, 158, 11, 0.1);
   text-align: center;
 }
 
 /* ===================================================
-   主體行程工作表 (ItineraryTable)
+   主體行程工作表 (ItineraryTable) - 附圖 4x2 完美佈局
    =================================================== */
 .itinerary-table-container {
-  padding: 18px 20px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
-.table-header-bar {
+.compact-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-.header-left {
+.compact-header .header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
-.table-icon {
-  color: var(--primary);
-}
-.table-title {
-  font-size: 1.1rem;
+.compact-header .table-title {
+  font-size: 0.95rem;
   font-weight: 700;
 }
-.days-counter {
-  font-size: 0.8rem;
+.compact-header .days-counter {
+  font-size: 0.72rem;
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.05);
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
 }
+.compact-btn {
+  padding: 4px 8px;
+  font-size: 0.74rem;
+}
+
+/* 每日卡片群 - Gap 收緊 10% */
 .days-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 10px;
 }
 .day-card {
   background: var(--surface-card);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
   transition: var(--transition);
 }
 .day-card:hover {
@@ -811,110 +806,129 @@ body {
   border-color: var(--primary);
   box-shadow: 0 0 16px rgba(99, 102, 241, 0.18);
 }
-.day-card-header {
+.compact-day-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 10px;
+  padding-bottom: 6px;
 }
-.day-badge-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.day-badge {
+.compact-day-header .day-badge {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
   font-weight: 700;
-  font-size: 0.88rem;
-  padding: 4px 12px;
-  border-radius: 6px;
+  font-size: 0.76rem;
+  padding: 2px 8px;
+  border-radius: 5px;
 }
-.day-date-input {
-  font-size: 0.95rem;
+.compact-day-header .day-date-input {
+  font-size: 0.84rem;
   font-weight: 600;
   background: transparent;
   border: none;
   border-bottom: 1px dashed var(--text-muted);
   color: var(--text-primary);
   outline: none;
-  min-width: 180px;
+  min-width: 150px;
 }
-.day-date-input:focus {
+.compact-day-header .day-date-input:focus {
   border-bottom-color: var(--primary);
 }
-.day-header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.day-total-badge {
-  font-size: 0.84rem;
+.compact-day-header .day-total-badge {
+  font-size: 0.76rem;
   color: var(--text-secondary);
 }
-.day-total-badge strong {
+.compact-day-header .day-total-badge strong {
   color: #38bdf8;
-  font-size: 0.95rem;
+  font-size: 0.86rem;
 }
 
-/* 核心區塊 1: 交通安排 */
-.section-block {
-  background: rgba(0, 0, 0, 0.22);
+/* 附圖精準 4x2 網格佈局 (上排 4 個，下排 4 個) */
+.day-grid-4x2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+.grid-cell-card {
+  background: rgba(0, 0, 0, 0.24);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  border-radius: 6px;
+  padding: 7px 8px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
+  min-height: 140px;
 }
-.block-title {
+.grid-cell-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.grid-cell-card .cell-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
+  justify-content: space-between;
+  font-size: 0.74rem;
   font-weight: 600;
-  color: #a5b4fc;
 }
-.block-icon {
-  color: #818cf8;
+.grid-cell-card .header-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
-.block-grid {
-  display: grid;
-  grid-template-columns: 2fr 1.2fr 1.5fr 1fr 1.3fr;
-  gap: 10px;
+.grid-cell-card .cell-icon {
+  flex-shrink: 0;
 }
-.field-group {
+.transit-color { color: #818cf8; }
+.morning-color { color: #f59e0b; }
+.afternoon-color { color: #f97316; }
+.evening-color { color: #a855f7; }
+.misc-color { color: #94a3b8; }
+.lunch-color { color: #fbbf24; }
+.dinner-color { color: #ef4444; }
+.hotel-color { color: #ec4899; }
+
+.category-hint {
+  font-size: 0.62rem;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+.grid-cell-card .cell-body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  height: 100%;
 }
-.field-group label {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-.field-group input, .field-group textarea {
+.grid-cell-card input, .grid-cell-card textarea {
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--surface-border);
-  border-radius: 6px;
+  border-radius: 4px;
   color: var(--text-primary);
-  font-size: 0.84rem;
-  padding: 7px 10px;
+  font-size: 0.74rem;
+  padding: 4px 6px;
   outline: none;
-  transition: var(--transition);
+  width: 100%;
+  resize: vertical;
 }
-.field-group input:focus, .field-group textarea:focus {
+.grid-cell-card input:focus, .grid-cell-card textarea:focus {
   border-color: var(--primary);
 }
+.location-sub-input {
+  color: #a5b4fc !important;
+  font-size: 0.72rem !important;
+}
+.sub-input-row {
+  display: flex;
+  gap: 4px;
+}
 
-/* 花費輸入膠囊 (Expense Pill) */
+/* 花費輸入膠囊 (Expense Pill) - 縮小 10% */
 .expense-input-pill {
   display: flex;
   align-items: center;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--surface-border);
-  border-radius: 6px;
+  border-radius: 4px;
   overflow: hidden;
 }
 .expense-input-pill input {
@@ -923,8 +937,9 @@ body {
   border: none !important;
   color: #38bdf8 !important;
   font-weight: 600;
-  padding: 7px 8px !important;
+  padding: 4px 6px !important;
   outline: none;
+  font-size: 0.74rem !important;
   width: 100%;
 }
 .expense-input-pill select {
@@ -932,8 +947,8 @@ body {
   border: none;
   border-left: 1px solid var(--surface-border);
   color: var(--text-secondary);
-  font-size: 0.76rem;
-  padding: 7px 6px;
+  font-size: 0.68rem;
+  padding: 4px 5px;
   cursor: pointer;
   outline: none;
 }
@@ -942,89 +957,13 @@ body {
 }
 .expense-input-pill.mini {
   margin-top: auto;
-  font-size: 0.74rem;
-  padding-left: 6px;
+  font-size: 0.68rem;
+  padding-left: 4px;
 }
 .expense-input-pill.mini label {
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   color: var(--text-muted);
   white-space: nowrap;
-}
-
-/* 核心區塊 2: 時段行程與用餐卡片 (五列排版) */
-.schedule-segments-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-}
-.segment-card {
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.segment-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-.seg-icon.morning-color { color: #f59e0b; }
-.seg-icon.lunch-color { color: #fbbf24; }
-.seg-icon.afternoon-color { color: #f97316; }
-.seg-icon.dinner-color { color: #ef4444; }
-.seg-icon.evening-color { color: #8b5cf6; }
-
-.category-hint {
-  font-size: 0.68rem;
-  background: rgba(255, 255, 255, 0.07);
-  padding: 1px 6px;
-  border-radius: 4px;
-  color: var(--text-muted);
-}
-.segment-body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  height: 100%;
-}
-.segment-body input, .segment-body textarea {
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--surface-border);
-  border-radius: 6px;
-  color: var(--text-primary);
-  font-size: 0.82rem;
-  padding: 6px 8px;
-  outline: none;
-  width: 100%;
-  resize: vertical;
-}
-.location-sub-input {
-  color: #a5b4fc !important;
-  font-size: 0.76rem !important;
-}
-
-/* 核心區塊 3 & 4: 底部夜間住宿與雜項支出 */
-.bottom-sections-row {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 12px;
-}
-.hotel-color { color: #a855f7; }
-.misc-color { color: #94a3b8; }
-.block-grid-hotel {
-  display: grid;
-  grid-template-columns: 1.2fr 1.5fr 1fr;
-  gap: 10px;
-}
-.block-grid-misc {
-  display: grid;
-  grid-template-columns: 2fr 1.2fr;
-  gap: 10px;
 }
 
 /* ===================================================
