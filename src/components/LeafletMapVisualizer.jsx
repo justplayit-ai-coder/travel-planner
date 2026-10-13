@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { extractTripMapLocations } from '../utils/budgetCalculator';
-import { Layers, MapPin, Navigation } from 'lucide-react';
+import { Layers, MapPin, Navigation, X } from 'lucide-react';
 
 // 修復 Leaflet 預設 Marker 圖示遺失問題
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -56,23 +56,30 @@ export default function LeafletMapVisualizer({ trip, activeDayIndex, onCloseMap 
           <span className="map-title">行程地理視覺化地圖 (Leaflet + OSM)</span>
         </div>
 
-        {/* 天數過濾器 */}
-        <div className="map-filters">
-          <button 
-            onClick={() => setFilterDay(null)}
-            className={`map-filter-chip ${filterDay === null ? 'active' : ''}`}
-          >
-            全部天數
-          </button>
-          {(trip.days || []).map(d => (
-            <button
-              key={d.dayIndex}
-              onClick={() => setFilterDay(d.dayIndex)}
-              className={`map-filter-chip ${filterDay === d.dayIndex ? 'active' : ''}`}
+        {/* 天數過濾器與收合按鈕 */}
+        <div className="map-toolbar-right">
+          <div className="map-filters">
+            <button 
+              onClick={() => setFilterDay(null)}
+              className={`map-filter-chip ${filterDay === null ? 'active' : ''}`}
             >
-              Day {d.dayIndex}
+              全部
             </button>
-          ))}
+            {(trip.days || []).map(d => (
+              <button
+                key={d.dayIndex}
+                onClick={() => setFilterDay(d.dayIndex)}
+                className={`map-filter-chip ${filterDay === d.dayIndex ? 'active' : ''}`}
+              >
+                D{d.dayIndex}
+              </button>
+            ))}
+          </div>
+          {onCloseMap && (
+            <button onClick={onCloseMap} className="btn-icon map-close-btn" title="收起地圖">
+              <X size={18} />
+            </button>
+          )}
         </div>
       </div>
 

@@ -147,18 +147,8 @@ function App() {
           />
         )}
 
-        {/* 內容分割區：地圖 (若開啟) + 統一行程工作表 */}
+        {/* 內容分割區：左側每日行程圖卡 (隨捲軸移動) + 右側固定地圖版位 (不隨捲軸移動) */}
         <div className="workspace-split">
-          {isMapVisible && activeTrip && (
-            <div className="map-view-column">
-              <LeafletMapVisualizer
-                trip={activeTrip}
-                activeDayIndex={activeDayIndex}
-                onCloseMap={() => setIsMapVisible(false)}
-              />
-            </div>
-          )}
-
           <div className="table-view-column">
             {activeTrip && (
               <ItineraryTable
@@ -169,6 +159,16 @@ function App() {
               />
             )}
           </div>
+
+          {isMapVisible && activeTrip && (
+            <div className="map-view-column">
+              <LeafletMapVisualizer
+                trip={activeTrip}
+                activeDayIndex={activeDayIndex}
+                onCloseMap={() => setIsMapVisible(false)}
+              />
+            </div>
+          )}
         </div>
       </main>
 

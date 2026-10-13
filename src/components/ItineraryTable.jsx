@@ -87,7 +87,7 @@ export default function ItineraryTable({
       <div className="table-header-bar">
         <div className="header-left">
           <Calendar className="table-icon" size={20} />
-          <h2 className="table-title">統一每日行程與花費工作表</h2>
+          <h2 className="table-title">每日行程與花費</h2>
           <span className="days-counter">共 {trip.days?.length || 0} 天行程</span>
         </div>
         <button onClick={handleAddDay} className="btn btn-primary add-day-btn">

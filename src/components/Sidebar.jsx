@@ -8,7 +8,7 @@ import {
   Compass, 
   FolderArchive, 
   Calendar, 
-  Lock, 
+  LogOut, 
   Trash2,
   FolderOpen
 } from 'lucide-react';
@@ -181,11 +181,11 @@ export default function Sidebar({
         </div>
       )}
 
-      {/* 底部登出與金鑰保護 */}
+      {/* 底部登出功能 */}
       <div className="sidebar-footer">
-        <button onClick={onLockSystem} className="btn-icon lock-btn" title="鎖定系統 (需輸入密碼解鎖)">
-          <Lock size={18} />
-          {!isCollapsed && <span>鎖定金鑰</span>}
+        <button onClick={onLockSystem} className="btn-icon lock-btn" title="登出系統">
+          <LogOut size={18} />
+          {!isCollapsed && <span>登出</span>}
         </button>
       </div>
     </aside>

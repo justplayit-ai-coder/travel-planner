@@ -134,10 +134,6 @@ export default function BudgetDashboard({
             <span>匯入 CSV</span>
           </button>
 
-          <button onClick={handleDownloadSample} className="btn-icon" title="下載標準 CSV 範本">
-            <FileText size={17} />
-          </button>
-
           <button onClick={onOpenAIModal} className="btn btn-ai-sparkle" title="AI 助理 (健檢 / 微調 / 簡報)">
             <Sparkles size={16} />
             <span>AI 助理</span>
