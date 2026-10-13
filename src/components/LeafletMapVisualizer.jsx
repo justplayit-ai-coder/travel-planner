@@ -29,6 +29,21 @@ function AutoFitBounds({ locations }) {
   return null;
 }
 
+// 建立依行程順序 1, 2, 3... 編號的數字圖釘圖示
+const createNumberedMarkerIcon = (number) => {
+  return L.divIcon({
+    className: 'custom-numbered-marker-wrapper',
+    html: `
+      <div class="marker-pin-badge">
+        <span class="marker-number-text">${number}</span>
+      </div>
+    `,
+    iconSize: [28, 34],
+    iconAnchor: [14, 34],
+    popupAnchor: [0, -32]
+  });
+};
+
 export default function LeafletMapVisualizer({ trip, activeDayIndex, onCloseMap }) {
   const [filterDay, setFilterDay] = useState(activeDayIndex || null);
 
@@ -95,10 +110,17 @@ export default function LeafletMapVisualizer({ trip, activeDayIndex, onCloseMap 
           />
 
           {mapLocations.map((loc, idx) => (
-            <Marker key={loc.id || idx} position={[loc.lat, loc.lng]}>
+            <Marker 
+              key={loc.id || idx} 
+              position={[loc.lat, loc.lng]}
+              icon={createNumberedMarkerIcon(idx + 1)}
+            >
               <Popup>
                 <div className="map-popup-card">
-                  <div className="popup-day-tag">Day {loc.dayIndex} · {loc.period}</div>
+                  <div className="popup-day-tag">
+                    <span className="popup-order-badge">#{idx + 1}</span>
+                    <span>Day {loc.dayIndex} · {loc.period}</span>
+                  </div>
                   <strong className="popup-name">{loc.name}</strong>
                   <div className="popup-date">{loc.date}</div>
                 </div>

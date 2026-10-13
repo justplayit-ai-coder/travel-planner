@@ -732,6 +732,17 @@ body {
   font-size: 0.7rem;
   color: #6366f1;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.popup-order-badge {
+  background: #6366f1;
+  color: #ffffff;
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 700;
 }
 .popup-name {
   font-size: 0.9rem;
@@ -739,6 +750,42 @@ body {
 .popup-date {
   font-size: 0.7rem;
   color: #64748b;
+}
+
+/* 數字圖釘 Marker (1, 2, 3... 行程順序標號) */
+.custom-numbered-marker-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
+.marker-pin-badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50% 50% 50% 0;
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  margin: -13px 0 0 -13px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+.marker-pin-badge:hover {
+  transform: rotate(-45deg) scale(1.15);
+  background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
+}
+.marker-number-text {
+  transform: rotate(45deg);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  line-height: 1;
 }
 .no-markers-hint {
   padding: 6px 12px;
