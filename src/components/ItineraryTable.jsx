@@ -37,6 +37,16 @@ export default function ItineraryTable({
     onUpdateTrip({ ...trip, days: updatedDays });
   };
 
+  // 輔助函式：取得區塊的文字內容（相容舊資料中零散的欄位）
+  const getSectionText = (sec, defaultFields = []) => {
+    if (!sec) return '';
+    if (sec.details !== undefined && sec.details !== '') return sec.details;
+    if (sec.notes !== undefined && sec.notes !== '') return sec.notes;
+    // 將舊欄位內容組合成清晰多行字串
+    const parts = defaultFields.map(f => sec[f]).filter(Boolean);
+    return parts.join('\n');
+  };
+
   // 處理日期字串更新
   const handleUpdateDate = (dayIndex, newDate) => {
     const updatedDays = trip.days.map(d => {
@@ -52,14 +62,14 @@ export default function ItineraryTable({
     const newDay = {
       dayIndex: nextIndex,
       date: `Day ${nextIndex}`,
-      transit: { trainCode: '', timeRange: '', backupPlan: '', duration: '', expenseAmount: 0, currency: currencyName },
-      morning: { details: '', location: '', expenseAmount: 0, currency: currencyName },
-      lunch: { restaurant: '', location: '', expenseAmount: 0, currency: currencyName },
-      afternoon: { details: '', location: '', expenseAmount: 0, currency: currencyName },
-      dinner: { restaurant: '', location: '', expenseAmount: 0, currency: currencyName },
-      evening: { details: '', location: '', expenseAmount: 0, currency: currencyName },
-      accommodation: { name: '', roomType: '', notes: '', expenseAmount: 0, currency: currencyName },
-      miscellaneous: { notes: '', expenseAmount: 0, currency: currencyName }
+      transit: { details: '', expenseAmount: 0, currency: currencyName },
+      morning: { details: '', expenseAmount: 0, currency: currencyName },
+      lunch: { details: '', expenseAmount: 0, currency: currencyName },
+      afternoon: { details: '', expenseAmount: 0, currency: currencyName },
+      dinner: { details: '', expenseAmount: 0, currency: currencyName },
+      evening: { details: '', expenseAmount: 0, currency: currencyName },
+      accommodation: { details: '', expenseAmount: 0, currency: currencyName },
+      miscellaneous: { details: '', expenseAmount: 0, currency: currencyName }
     };
     onUpdateTrip({ ...trip, days: [...(trip.days || []), newDay] });
   };
@@ -78,7 +88,7 @@ export default function ItineraryTable({
 
   return (
     <div className="itinerary-table-container glass-panel">
-      {/* 標題與操作按鈕（文字與按鈕縮小 10%） */}
+      {/* 標題與操作按鈕 */}
       <div className="table-header-bar compact-header">
         <div className="header-left">
           <Calendar className="table-icon" size={17} />
@@ -115,7 +125,7 @@ export default function ItineraryTable({
               className={`day-card ${isSelected ? 'active-day-focus' : ''}`}
               onClick={() => onSelectDay && onSelectDay(day.dayIndex)}
             >
-              {/* Day Header 頂部列（文字縮小 10%） */}
+              {/* Day Header 頂部列 */}
               <div className="day-card-header compact-day-header">
                 <div className="day-badge-wrap">
                   <span className="day-badge">Day {day.dayIndex}</span>
@@ -149,12 +159,12 @@ export default function ItineraryTable({
                 </div>
               </div>
 
-              {/* 依附圖 4x2 完美排版佈局：上排 4 個，下排 4 個 */}
+              {/* 依附圖 4x2 網格佈局：上排 4 格 (高度為下排 2 倍)，全部統一為自由文字區塊 */}
               <div className="day-grid-4x2">
-                {/* ====== 上排 Row 1 ====== */}
+                {/* ====== 上排 Row 1 (上排高度為下排兩倍) ====== */}
                 
-                {/* 1-1. 交通 (上排第 1 格) */}
-                <div className="grid-cell-card transit-card">
+                {/* 1-1. 交通 (單純多行文字框，方便輸入多筆班次與轉乘資訊) */}
+                <div className="grid-cell-card transit-card top-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Train size={14} className="cell-icon transit-color" />
@@ -162,33 +172,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">交通</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.transit?.trainCode || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'trainCode', e.target.value)}
-                      placeholder="車次/班次 (例: はやぶさ 11號)"
-                    />
-                    <div className="sub-input-row">
-                      <input
-                        type="text"
-                        value={day.transit?.timeRange || ''}
-                        onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'timeRange', e.target.value)}
-                        placeholder="時間起訖 (09:36-12:34)"
-                      />
-                      <input
-                        type="text"
-                        value={day.transit?.duration || ''}
-                        onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'duration', e.target.value)}
-                        placeholder="車程 (4h 45m)"
-                        style={{ maxWidth: '90px' }}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={day.transit?.backupPlan || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'backupPlan', e.target.value)}
-                      placeholder="轉乘備案 / 備註"
+                  <div className="cell-body flexible-body">
+                    <textarea
+                      value={getSectionText(day.transit, ['trainCode', 'timeRange', 'duration', 'backupPlan'])}
+                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'details', e.target.value)}
+                      placeholder="輸入交通班次、時間、轉乘細節... (支援自由換行多筆輸入)"
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>交通費:</label>
@@ -208,8 +197,8 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* 1-2. 上午行程 (上排第 2 格) */}
-                <div className="grid-cell-card morning-card">
+                {/* 1-2. 上午行程 (單純多行文字框) */}
+                <div className="grid-cell-card morning-card top-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Sun size={14} className="cell-icon morning-color" />
@@ -217,19 +206,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">行程門票</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.morning?.location || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'morning', 'location', e.target.value)}
-                      className="location-sub-input"
-                      placeholder="地點/景點名稱 (地圖定位)"
-                    />
+                  <div className="cell-body flexible-body">
                     <textarea
-                      value={day.morning?.details || ''}
+                      value={getSectionText(day.morning, ['location', 'details'])}
                       onChange={(e) => handleUpdateDayField(day.dayIndex, 'morning', 'details', e.target.value)}
-                      placeholder="活動與行程安排細節..."
-                      rows={2}
+                      placeholder="輸入上午行程、參訪景點、活動時間與細節..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>門票費:</label>
@@ -249,8 +231,8 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* 1-3. 下午行程 (上排第 3 格) */}
-                <div className="grid-cell-card afternoon-card">
+                {/* 1-3. 下午行程 (單純多行文字框) */}
+                <div className="grid-cell-card afternoon-card top-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Sunset size={14} className="cell-icon afternoon-color" />
@@ -258,19 +240,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">行程門票</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.afternoon?.location || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'afternoon', 'location', e.target.value)}
-                      className="location-sub-input"
-                      placeholder="地點/景點名稱 (地圖定位)"
-                    />
+                  <div className="cell-body flexible-body">
                     <textarea
-                      value={day.afternoon?.details || ''}
+                      value={getSectionText(day.afternoon, ['location', 'details'])}
                       onChange={(e) => handleUpdateDayField(day.dayIndex, 'afternoon', 'details', e.target.value)}
-                      placeholder="下午精華景點細節..."
-                      rows={2}
+                      placeholder="輸入下午景點、行程規劃與活動內容..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>門票費:</label>
@@ -290,8 +265,8 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* 1-4. 晚上行程 (上排第 4 格) */}
-                <div className="grid-cell-card evening-card">
+                {/* 1-4. 晚上行程 (單純多行文字框) */}
+                <div className="grid-cell-card evening-card top-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Moon size={14} className="cell-icon evening-color" />
@@ -299,19 +274,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">行程門票</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.evening?.location || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'evening', 'location', e.target.value)}
-                      className="location-sub-input"
-                      placeholder="夜間散策/商圈 (地圖定位)"
-                    />
+                  <div className="cell-body flexible-body">
                     <textarea
-                      value={day.evening?.details || ''}
+                      value={getSectionText(day.evening, ['location', 'details'])}
                       onChange={(e) => handleUpdateDayField(day.dayIndex, 'evening', 'details', e.target.value)}
-                      placeholder="夜逛商場、溫泉放鬆..."
-                      rows={2}
+                      placeholder="輸入夜間散策、購物商場、活動細節..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>門票費:</label>
@@ -331,10 +299,10 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* ====== 下排 Row 2 ====== */}
+                {/* ====== 下排 Row 2 (下排高度為上排的一半) ====== */}
 
-                {/* 2-1. 雜支 (下排第 1 格，正對應交通) */}
-                <div className="grid-cell-card misc-card">
+                {/* 2-1. 雜支 (單純多行文字框，正對應交通) */}
+                <div className="grid-cell-card misc-card bottom-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Receipt size={14} className="cell-icon misc-color" />
@@ -342,12 +310,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">雜支</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.miscellaneous?.notes || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'miscellaneous', 'notes', e.target.value)}
-                      placeholder="雜支備註 (例: 寄物櫃、超商飲料)"
+                  <div className="cell-body flexible-body">
+                    <textarea
+                      value={getSectionText(day.miscellaneous, ['notes'])}
+                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'miscellaneous', 'details', e.target.value)}
+                      placeholder="輸入雜項備註 (寄物櫃、超商零食、各項備用金)..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>雜支費:</label>
@@ -367,8 +335,8 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* 2-2. 午餐 (下排第 2 格，正對應上午行程) */}
-                <div className="grid-cell-card lunch-card">
+                {/* 2-2. 午餐 (單純多行文字框，正對應上午行程) */}
+                <div className="grid-cell-card lunch-card bottom-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Utensils size={14} className="cell-icon lunch-color" />
@@ -376,19 +344,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">餐食</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.lunch?.restaurant || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'lunch', 'restaurant', e.target.value)}
-                      placeholder="餐廳名稱與特色料理..."
-                    />
-                    <input
-                      type="text"
-                      value={day.lunch?.location || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'lunch', 'location', e.target.value)}
-                      className="location-sub-input"
-                      placeholder="餐廳地址/區域 (地圖定位)"
+                  <div className="cell-body flexible-body">
+                    <textarea
+                      value={getSectionText(day.lunch, ['restaurant', 'location'])}
+                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'lunch', 'details', e.target.value)}
+                      placeholder="輸入午餐餐廳、菜色、地址與預約資訊..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>午餐費:</label>
@@ -408,8 +369,8 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* 2-3. 晚餐 (下排第 3 格，正對應下午行程) */}
-                <div className="grid-cell-card dinner-card">
+                {/* 2-3. 晚餐 (單純多行文字框，正對應下午行程) */}
+                <div className="grid-cell-card dinner-card bottom-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Utensils size={14} className="cell-icon dinner-color" />
@@ -417,19 +378,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">餐食</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.dinner?.restaurant || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'dinner', 'restaurant', e.target.value)}
-                      placeholder="晚餐居酒屋/私廚餐廳..."
-                    />
-                    <input
-                      type="text"
-                      value={day.dinner?.location || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'dinner', 'location', e.target.value)}
-                      className="location-sub-input"
-                      placeholder="晚餐地址/區域 (地圖定位)"
+                  <div className="cell-body flexible-body">
+                    <textarea
+                      value={getSectionText(day.dinner, ['restaurant', 'location'])}
+                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'dinner', 'details', e.target.value)}
+                      placeholder="輸入晚餐餐廳、在地料理、預約時段..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>晚餐費:</label>
@@ -449,8 +403,8 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                {/* 2-4. 住宿 (下排第 4 格，正對應晚上行程) */}
-                <div className="grid-cell-card hotel-card">
+                {/* 2-4. 住宿 (單純多行文字框，正對應晚上行程) */}
+                <div className="grid-cell-card hotel-card bottom-tier-cell">
                   <div className="cell-header">
                     <div className="header-label">
                       <Hotel size={14} className="cell-icon hotel-color" />
@@ -458,18 +412,12 @@ export default function ItineraryTable({
                     </div>
                     <span className="category-hint">住宿</span>
                   </div>
-                  <div className="cell-body">
-                    <input
-                      type="text"
-                      value={day.accommodation?.name || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'accommodation', 'name', e.target.value)}
-                      placeholder="飯店名稱 (例: ReLabo)"
-                    />
-                    <input
-                      type="text"
-                      value={day.accommodation?.notes || ''}
-                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'accommodation', 'notes', e.target.value)}
-                      placeholder="房型與設施備註 (溫泉 Spa)"
+                  <div className="cell-body flexible-body">
+                    <textarea
+                      value={getSectionText(day.accommodation, ['name', 'notes'])}
+                      onChange={(e) => handleUpdateDayField(day.dayIndex, 'accommodation', 'details', e.target.value)}
+                      placeholder="輸入飯店名稱、房型、溫泉設施、入住時間..."
+                      className="pure-textarea"
                     />
                     <div className="expense-input-pill mini">
                       <label>住宿費:</label>
