@@ -17,6 +17,26 @@ import {
 import { calculateTripBudget } from '../utils/budgetCalculator';
 import { exportTripToCSV, downloadCSVFile, getSampleCSVTemplate } from '../utils/csvHandler';
 
+// 常見旅遊外幣代碼與名稱清單
+export const POPULAR_CURRENCIES = [
+  { code: 'JPY', name: '日圓 (JPY)' },
+  { code: 'KRW', name: '韓元 (KRW)' },
+  { code: 'USD', name: '美元 (USD)' },
+  { code: 'EUR', name: '歐元 (EUR)' },
+  { code: 'THB', name: '泰銖 (THB)' },
+  { code: 'VND', name: '越南盾 (VND)' },
+  { code: 'HKD', name: '港幣 (HKD)' },
+  { code: 'CNY', name: '人民幣 (CNY)' },
+  { code: 'SGD', name: '新加坡幣 (SGD)' },
+  { code: 'GBP', name: '英鎊 (GBP)' },
+  { code: 'AUD', name: '澳幣 (AUD)' },
+  { code: 'CAD', name: '加拿大幣 (CAD)' },
+  { code: 'CHF', name: '瑞士法郎 (CHF)' },
+  { code: 'MYR', name: '馬幣 (MYR)' },
+  { code: 'PHP', name: '披索 (PHP)' },
+  { code: 'NZD', name: '紐幣 (NZD)' }
+];
+
 export default function BudgetDashboard({
   trip,
   onUpdateTrip,
@@ -30,6 +50,36 @@ export default function BudgetDashboard({
   const handleRateChange = (e) => {
     const val = parseFloat(e.target.value) || 0;
     onUpdateTrip({ ...trip, exchangeRate: val });
+  };
+
+  const handleCurrencyChange = (e) => {
+    const newCurrency = e.target.value;
+    const oldCurrency = trip.currencyName || 'JPY';
+    if (newCurrency === oldCurrency) return;
+
+    // 將所有原本非 TWD 的項目同步更新為新的外幣代碼
+    const updatedDays = (trip.days || []).map(day => {
+      const updatedDay = { ...day };
+      const sections = ['transit', 'morning', 'lunch', 'afternoon', 'dinner', 'evening', 'accommodation', 'miscellaneous'];
+      sections.forEach(sec => {
+        if (updatedDay[sec]) {
+          const currentCur = updatedDay[sec].currency;
+          if (!currentCur || currentCur === oldCurrency || currentCur !== 'TWD') {
+            updatedDay[sec] = { ...updatedDay[sec], currency: newCurrency };
+          }
+        }
+      });
+      return updatedDay;
+    });
+
+    const updatedAirfareCurrency = trip.airfareCurrency === 'TWD' ? 'TWD' : newCurrency;
+
+    onUpdateTrip({
+      ...trip,
+      currencyName: newCurrency,
+      airfareCurrency: updatedAirfareCurrency,
+      days: updatedDays
+    });
   };
 
   const handleNameChange = (e) => {
@@ -82,13 +132,30 @@ export default function BudgetDashboard({
             placeholder="輸入旅程名稱..."
           />
           <div className="rate-badge">
+            <span className="rate-label">外幣:</span>
+            <select
+              value={currencyName}
+              onChange={handleCurrencyChange}
+              className="currency-dropdown"
+              title="選擇主要外幣幣別"
+            >
+              {POPULAR_CURRENCIES.map(curr => (
+                <option key={curr.code} value={curr.code}>
+                  {curr.name}
+                </option>
+              ))}
+              {!POPULAR_CURRENCIES.some(c => c.code === currencyName) && (
+                <option value={currencyName}>{currencyName}</option>
+              )}
+            </select>
             <span className="rate-label">匯率 (1 {currencyName} =):</span>
             <input 
               type="number" 
-              step="0.001" 
+              step="0.0001" 
               value={trip.exchangeRate} 
               onChange={handleRateChange}
               className="rate-input"
+              title="手動輸入外幣折合新台幣匯率"
             />
             <span className="rate-unit">TWD</span>
           </div>

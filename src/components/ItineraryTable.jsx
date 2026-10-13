@@ -22,6 +22,11 @@ export default function ItineraryTable({
   const currencyName = trip.currencyName || 'JPY';
   const exchangeRate = trip.exchangeRate || 0.205;
 
+  // 規範外幣代碼：若不是 TWD 則一律以目前頂部選定的主要外幣為依據
+  const getNormalizedCurrency = (cur) => {
+    return cur === 'TWD' ? 'TWD' : currencyName;
+  };
+
   // 處理特定天數內某個區塊的欄位更新
   const handleUpdateDayField = (dayIndex, section, field, value) => {
     const updatedDays = trip.days.map(d => {
@@ -190,7 +195,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.transit?.currency || currencyName}
+                        value={getNormalizedCurrency(day.transit?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'transit', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -224,7 +229,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'morning', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.morning?.currency || currencyName}
+                        value={getNormalizedCurrency(day.morning?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'morning', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -258,7 +263,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'afternoon', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.afternoon?.currency || currencyName}
+                        value={getNormalizedCurrency(day.afternoon?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'afternoon', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -292,7 +297,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'evening', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.evening?.currency || currencyName}
+                        value={getNormalizedCurrency(day.evening?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'evening', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -328,7 +333,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'miscellaneous', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.miscellaneous?.currency || currencyName}
+                        value={getNormalizedCurrency(day.miscellaneous?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'miscellaneous', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -362,7 +367,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'lunch', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.lunch?.currency || currencyName}
+                        value={getNormalizedCurrency(day.lunch?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'lunch', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -396,7 +401,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'dinner', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.dinner?.currency || currencyName}
+                        value={getNormalizedCurrency(day.dinner?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'dinner', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
@@ -430,7 +435,7 @@ export default function ItineraryTable({
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'accommodation', 'expenseAmount', parseFloat(e.target.value) || 0)}
                       />
                       <select
-                        value={day.accommodation?.currency || currencyName}
+                        value={getNormalizedCurrency(day.accommodation?.currency)}
                         onChange={(e) => handleUpdateDayField(day.dayIndex, 'accommodation', 'currency', e.target.value)}
                       >
                         <option value={currencyName}>{currencyName}</option>
