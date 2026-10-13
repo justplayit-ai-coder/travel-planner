@@ -813,6 +813,15 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: 6px;
 }
+.day-header-left {
+  display: flex;
+  align-items: center;
+}
+.day-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .compact-day-header .day-badge {
   background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
@@ -829,46 +838,53 @@ body {
   border-bottom: 1px dashed var(--text-muted);
   color: var(--text-primary);
   outline: none;
-  min-width: 150px;
+  min-width: 140px;
 }
 .compact-day-header .day-date-input:focus {
   border-bottom-color: var(--primary);
 }
-.compact-day-header .day-total-badge {
+.day-total-badge.pinned-left {
+  margin-left: 10ch; /* 固定在天數日期後方留空 10 個字元 */
   font-size: 0.76rem;
   color: var(--text-secondary);
+  white-space: nowrap;
 }
-.compact-day-header .day-total-badge strong {
+.day-total-badge.pinned-left strong {
   color: #38bdf8;
   font-size: 0.86rem;
 }
+.day-header-right-action {
+  margin-left: auto; /* 靠最右切齊 */
+  display: flex;
+  align-items: center;
+}
 
-/* 附圖精準 4x2 網格佈局 (高度放大 80%，上排高度為下排 2 倍，純文字自由輸入) */
+/* 附圖精準 4x2 網格佈局 (高度縮小 20%，維持上排為下排 2 倍高) */
 .day-grid-4x2 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: 2fr 1fr;
   gap: 7px;
-  min-height: 460px;
+  min-height: 368px; /* 460px 縮小 20% = 368px */
 }
 .grid-cell-card {
   background: rgba(0, 0, 0, 0.24);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 6px;
-  padding: 8px 9px;
+  padding: 7px 8px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   transition: var(--transition);
 }
 .grid-cell-card:hover {
   border-color: rgba(255, 255, 255, 0.12);
 }
 .grid-cell-card.top-tier-cell {
-  min-height: 290px;
+  min-height: 232px; /* 290px 縮小 20% = 232px */
 }
 .grid-cell-card.bottom-tier-cell {
-  min-height: 145px;
+  min-height: 116px; /* 145px 縮小 20% = 116px (上排剛好為下排 2 倍) */
 }
 .grid-cell-card .cell-header {
   display: flex;
@@ -1448,4 +1464,161 @@ body {
   justify-content: flex-end;
   gap: 10px;
   margin-top: 8px;
+}
+
+/* ===================================================
+   RWD 響應式佈局 (適配平板與手機瀏覽)
+   =================================================== */
+
+/* 1. 平板橫向 / 小視窗 (<= 1100px) */
+@media (max-width: 1100px) {
+  .map-view-column {
+    width: 440px;
+  }
+  .category-cards-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 2. 平板直向 / 手機橫向 (<= 860px) */
+@media (max-width: 860px) {
+  body {
+    overflow-y: auto;
+  }
+  .travel-app-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .sidebar {
+    width: calc(100% - 16px);
+    margin: 8px;
+    max-height: 320px;
+  }
+  .sidebar.collapsed {
+    width: calc(100% - 16px);
+    height: 48px;
+  }
+  .main-content-zone {
+    padding: 8px;
+    gap: 8px;
+    overflow: visible;
+    height: auto;
+  }
+  .budget-dashboard {
+    padding: 8px 10px;
+  }
+  .dashboard-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .dashboard-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .budget-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .total-stat-card {
+    padding: 8px 12px;
+  }
+  .category-cards-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  
+  /* 工作區由左右並排改為上下垂直流式堆疊 */
+  .workspace-split {
+    flex-direction: column;
+    overflow: visible;
+    height: auto;
+    gap: 8px;
+  }
+  .map-view-column {
+    width: 100%;
+    max-width: 100%;
+    height: 280px;
+    position: static;
+    flex-shrink: 0;
+  }
+  .table-view-column {
+    overflow-y: visible;
+    height: auto;
+    padding-right: 0;
+  }
+
+  /* 4x2 網格在平板手機上變為 2 欄佈局 */
+  .day-grid-4x2 {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+    min-height: auto;
+    gap: 6px;
+  }
+  .grid-cell-card.top-tier-cell {
+    min-height: 180px;
+  }
+  .grid-cell-card.bottom-tier-cell {
+    min-height: 120px;
+  }
+  .day-total-badge.pinned-left {
+    margin-left: 14px;
+  }
+}
+
+/* 3. 直向手機模式 (<= 540px) */
+@media (max-width: 540px) {
+  .trip-title-input {
+    min-width: 140px;
+    font-size: 0.96rem;
+  }
+  .category-cards-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .day-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .day-header-left {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .day-total-badge.pinned-left {
+    margin-left: 0;
+    margin-top: 4px;
+    width: 100%;
+  }
+  .day-header-right-action {
+    align-self: flex-end;
+  }
+
+  /* 極小手機端：單欄滿版卡片，操作最舒適 */
+  .day-grid-4x2 {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .grid-cell-card.top-tier-cell,
+  .grid-cell-card.bottom-tier-cell {
+    min-height: 140px;
+  }
+
+  /* 彈窗在手機上填滿螢幕 */
+  .ai-modal-card {
+    max-height: 94vh;
+  }
+  .ai-tabs-bar {
+    flex-wrap: wrap;
+  }
+  .slide-canvas {
+    grid-template-columns: 1fr;
+  }
+  .slide-image-container {
+    height: 180px;
+  }
 }

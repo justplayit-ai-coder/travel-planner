@@ -125,23 +125,26 @@ export default function ItineraryTable({
               className={`day-card ${isSelected ? 'active-day-focus' : ''}`}
               onClick={() => onSelectDay && onSelectDay(day.dayIndex)}
             >
-              {/* Day Header 頂部列 */}
+              {/* Day Header 頂部列：花費往左靠留空 10 字元，刪除 icon 靠最右切齊 */}
               <div className="day-card-header compact-day-header">
-                <div className="day-badge-wrap">
-                  <span className="day-badge">Day {day.dayIndex}</span>
-                  <input
-                    type="text"
-                    value={day.date}
-                    onChange={(e) => handleUpdateDate(day.dayIndex, e.target.value)}
-                    className="day-date-input"
-                    placeholder="例: 2026-12-26 (六)"
-                  />
-                </div>
-                <div className="day-header-right">
-                  <div className="day-total-badge">
+                <div className="day-header-left">
+                  <div className="day-badge-wrap">
+                    <span className="day-badge">Day {day.dayIndex}</span>
+                    <input
+                      type="text"
+                      value={day.date}
+                      onChange={(e) => handleUpdateDate(day.dayIndex, e.target.value)}
+                      className="day-date-input"
+                      placeholder="例: 2026-12-26 (六)"
+                    />
+                  </div>
+                  <div className="day-total-badge pinned-left">
                     <span>當日花費: </span>
                     <strong>NT$ {dayTotalTWD.toLocaleString()}</strong>
                   </div>
+                </div>
+
+                <div className="day-header-right-action">
                   {trip.days.length > 1 && (
                     <button
                       onClick={(e) => {
