@@ -462,7 +462,9 @@ body {
   padding: 2px 5px;
   border-radius: 4px;
   outline: none;
-  min-width: 190px;
+  width: 380px;
+  min-width: 380px;
+  max-width: 100%;
 }
 .trip-title-input:focus {
   border-color: var(--primary);
