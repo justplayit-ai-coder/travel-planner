@@ -16,7 +16,7 @@ function App() {
 
   // 2. 旅程清單狀態（自動持久化至 LocalStorage）
   const [trips, setTrips] = useState(() => {
-    const saved = localStorage.getItem('travel_planner_trips_v3');
+    const saved = localStorage.getItem('travel_planner_trips_v4');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -47,7 +47,7 @@ function App() {
 
   // 同步儲存至 LocalStorage
   useEffect(() => {
-    localStorage.setItem('travel_planner_trips_v3', JSON.stringify(trips));
+    localStorage.setItem('travel_planner_trips_v4', JSON.stringify(trips));
   }, [trips]);
 
   // 鎖定系統

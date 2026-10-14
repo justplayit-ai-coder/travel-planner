@@ -1,350 +1,419 @@
-// 預設示範資料：精確還原附圖中「2026/12/25 - 2027/1/3 東北雪景與東京漫步 10日遊」
+// 預設旅程資料：東北雪之聖誕與東京跨年之旅 (2026/12/26 - 2027/01/01)
 export const initialTrips = [
   {
     id: 'trip-tohoku-2026',
-    name: '2026 日本東北雪景與東京漫步 10日遊',
-    startDate: '2026-12-25',
-    endDate: '2027-01-03',
+    name: '東北雪之聖誕與東京跨年之旅',
+    startDate: '2026-12-26',
+    endDate: '2027-01-01',
     exchangeRate: 0.205,
     currencyName: 'JPY',
     isArchived: false,
-    airfareAmount: 29726,
+    airfareAmount: 0,
     airfareCurrency: 'TWD',
     days: [
       {
         dayIndex: 1,
-        date: '2026-12-25 (五)',
+        date: '2026-12-26 (六)',
         transit: {
-          trainCode: 'CI222 TSA->HND',
-          timeRange: '18:25~22:15',
-          backupPlan: '松山飛羽田 直飛',
-          duration: '3h 50m',
-          expenseAmount: 5000,
+          trainCode: 'はやぶさ 11號 (東京->新青森)',
+          timeRange: '09:36-12:34',
+          duration: '4h 45m (285分)',
+          details: '09:36-12:34 (はやぶさ 11號 東京->新青森 178m)\n12:46-12:53 (奧羽本線普通 7m)\n14:01-14:44 (奧羽本線普通 43m) [備案: 13:52-14:26 白神4號 34m]\n14:50-15:05 (土手町循環巴士 15m)\n17:41-18:23 (奧羽本線快速 42m)\n當日總車程: 4h 45m (285分)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         morning: {
-          details: '整理行李與出發準備',
-          location: '松山機場',
+          location: '新青森站',
+          details: '首日搭最速達班次直達最北端 (12:34抵達新青森)\n12:53抵青森站直通 ReLabo 放行李',
           expenseAmount: 0,
-          currency: 'TWD'
+          currency: 'JPY'
         },
         lunch: {
-          restaurant: '市區早午餐 / 機場輕食',
-          location: '台北市',
+          restaurant: '&LOVINA 1F 青森食堂',
+          location: '青森站 &LOVINA',
+          details: '&LOVINA 1F 青森食堂午餐 (全室內免吹風)',
           expenseAmount: 0,
-          currency: 'TWD'
+          currency: 'JPY'
         },
         afternoon: {
-          details: '前往松山機場辦理報到手續出境',
-          location: '松山機場',
+          location: '弘前城',
+          details: '土手町100円巴士至市役所前\n弘前城雪中散策 (追手門進->下乘橋拍天守->三の丸東門出，60-70分)\n可否屋 葡瑠満 (現烤富士蜜蘋果派+手沖咖啡)\n弘前站 APPLIESE 名產採買\n17:41 快速車返程',
           expenseAmount: 0,
-          currency: 'TWD'
+          currency: 'JPY'
         },
         dinner: {
-          restaurant: '鳥貴族 羽田分店',
-          location: '羽田機場',
-          expenseAmount: 3000,
+          restaurant: '津輕じょっぱり漁屋酒場 或 旬料理 初花',
+          location: '津輕じょっぱり漁屋酒場',
+          details: '20:00 青森在地居酒屋/鄉土料理 (津輕じょっぱり漁屋酒場 或 旬料理 初花)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         evening: {
-          details: '抵達東京市區飯店 Check-in 休息',
-          location: '名鐵濱松町飯店',
+          location: 'ReLabo',
+          details: '18:25 抵達飯店辦理入住 ＆ 溫泉 Spa 享受放鬆',
           expenseAmount: 0,
           currency: 'JPY'
         },
         accommodation: {
-          name: '名鐵濱松町 (連泊預約)',
+          name: '青森市區飯店 ReLabo',
           roomType: '雙人房',
-          notes: '交通便利 近羽田單軌',
-          expenseAmount: 20330,
+          notes: '連泊第 1 晚 含溫泉 Spa',
+          details: '青森市區飯店 (連泊1) ReLabo；18:25 抵達飯店辦理入住 ＆ 溫泉 Spa',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         miscellaneous: {
-          notes: 'Suica 卡加值與機場伴手禮',
-          expenseAmount: 5000,
+          notes: '伴手禮與備用金',
+          details: '市區交通、寄物與超商零食',
+          expenseAmount: 0,
           currency: 'JPY'
         }
       },
       {
         dayIndex: 2,
-        date: '2026-12-26 (六)',
+        date: '2026-12-27 (日)',
         transit: {
-          trainCode: 'はやぶさ 11號 (東京->新青森) 178m',
-          timeRange: '09:36-12:34',
-          backupPlan: '13:52-14:26 白神4號 34m 備案',
-          duration: '4h 45m (285分)',
-          expenseAmount: 100000,
+          trainCode: 'JR巴士 はっこうだ2號/1號',
+          timeRange: '08:10-12:03',
+          duration: '1h 55m (115分)',
+          details: '08:10-09:10 (JR巴士 はっこうだ2號 60m)\n11:08-12:03 (JR巴士 はっこうだ1號 55m)\n當日總車程: 1h 55m (115分)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         morning: {
-          details: '首日搭最速達班次直達最北端 (12:34抵達新青森) -> 直通 ReLabo 放行李',
-          location: '新青森站',
+          location: '八甲田',
+          details: '上午八甲田野生樹冰\n12:03 返抵青森站',
           expenseAmount: 0,
           currency: 'JPY'
         },
         lunch: {
-          restaurant: '&LOVINA 1F 青森食堂午餐 (全室內免吹風)',
-          location: '青森站 &LOVINA',
-          expenseAmount: 6000,
+          restaurant: 'お食事処 おさない',
+          location: 'おさない',
+          details: '午餐: お食事処 おさない (帆立貝味噌燒/定食)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         afternoon: {
-          details: '弘前城雪中散策 (追手門進->下乘橋拍天守->三之丸東門出 60-70分)',
-          location: '弘前城',
-          expenseAmount: 670,
+          location: '睡魔之家 WA RASSE',
+          details: '午後青森港灣悠閒漫步 (免趕弘前，體力徹底放鬆):\n睡魔之家 WA RASSE ＆ A-FACTORY ＆ 港灣雪景散策\n17:00 回 ReLabo 享受下午場溫泉 Spa 換裝',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         dinner: {
-          restaurant: '津輕漁屋酒場 (青森在地鄉土料理居酒屋) 20:00',
-          location: '青森市區居酒屋',
-          expenseAmount: 14000,
+          restaurant: '花秀 (Kashu) 頂級法式私廚',
+          location: '花秀',
+          details: '18:30 花秀 (Kashu) 頂級法式私廚 (已確認預約)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         evening: {
-          details: '弘前站 APPLIESE 名產採買 (現烤富士蜜蘋果派+手沖咖啡) 17:41 快速車返程',
-          location: '弘前站 APPLIESE',
+          location: 'ReLabo',
+          details: '餐後返回飯店享受溫泉 Spa',
           expenseAmount: 0,
           currency: 'JPY'
         },
         accommodation: {
-          name: '青森市區飯店 ReLabo (連泊1)',
-          roomType: '雙人景觀房',
-          notes: '18:25 抵達辦理入住 & 溫泉 Spa',
-          expenseAmount: 58078,
+          name: '青森市區飯店 ReLabo',
+          roomType: '雙人房',
+          notes: '連泊第 2 晚',
+          details: '青森市區飯店 (連泊2) ReLabo；飯店溫泉 Spa',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         miscellaneous: {
-          notes: '土手町100円巴士與投幣寄物櫃',
-          expenseAmount: 1000,
+          notes: 'A-FACTORY 採買',
+          details: '名產蘋果酒採買',
+          expenseAmount: 0,
           currency: 'JPY'
         }
       },
       {
         dayIndex: 3,
-        date: '2026-12-27 (日)',
-        transit: {
-          trainCode: 'JR巴士 はっこうだ2號 (青森站->八甲田纜車)',
-          timeRange: '08:10-09:10',
-          backupPlan: '11:08-12:03 回程 はっこうだ1號 55m',
-          duration: '1h 55m (115分)',
-          expenseAmount: 10000,
-          currency: 'JPY'
-        },
-        morning: {
-          details: '上午八甲田野生樹冰搭乘纜車遠眺',
-          location: '八甲田山纜車',
-          expenseAmount: 2000,
-          currency: 'JPY'
-        },
-        lunch: {
-          restaurant: '丸青食堂・蘋果派・點心 (12:03 返青森站帆立貝味噌燒定食)',
-          location: '青森市區 古川市場',
-          expenseAmount: 8000,
-          currency: 'JPY'
-        },
-        afternoon: {
-          details: '青森港悠閒漫步 (睡魔之家 WA RASSE & A-FACTORY & 港灣雪景散策)',
-          location: '睡魔之家 WA RASSE',
-          expenseAmount: 600,
-          currency: 'JPY'
-        },
-        dinner: {
-          restaurant: '花秀 (Kashu) 頂級法式私廚 18:30 (已確認預約)',
-          location: '花秀 Kashu',
-          expenseAmount: 45000,
-          currency: 'JPY'
-        },
-        evening: {
-          details: '返回 ReLabo 享受下午場溫泉 Spa 換裝休養',
-          location: 'ReLabo 露天風呂',
-          expenseAmount: 0,
-          currency: 'JPY'
-        },
-        accommodation: {
-          name: '青森市區飯店 ReLabo (連泊2)',
-          roomType: '雙人景觀房',
-          notes: '飯店溫泉設施體驗',
-          expenseAmount: 49368,
-          currency: 'JPY'
-        },
-        miscellaneous: {
-          notes: 'A-FACTORY 伴手禮蘋果酒',
-          expenseAmount: 3500,
-          currency: 'JPY'
-        }
-      },
-      {
-        dayIndex: 4,
         date: '2026-12-28 (一)',
         transit: {
-          trainCode: 'はやぶさ 18號 (新青森->盛岡 53m) / 紫苑專車 25m',
-          timeRange: '11:52-12:45 / 15:00-15:25',
-          backupPlan: '盛岡站西口專車直達溫泉',
+          trainCode: 'はやぶさ 18號 (新青森->盛岡)',
+          timeRange: '11:43-15:25',
           duration: '1h 24m (84分)',
-          expenseAmount: 8500,
+          details: '【正常版】\n11:43-11:49 (奧羽本線普通 6m)\n11:52-12:45 (はやぶさ 18號 新青森->盛岡 53m)\n15:00-15:25 (紫苑專車 25m)\n總車程: 1h 24m (84分)\n\n【八甲田備案】\n08:10-09:10 / 11:08-12:03 (JR巴士八甲田往返 115m)\n13:08-13:14 (奧羽本線普通 6m)\n13:52-14:44 (はやぶさ 24號 52m)\n15:00-15:25 (紫苑專車 25m)\n總車程: 3h 18m (198分)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         morning: {
-          details: '青森悠閒採買與八甲田丸巡街 (船開 11:22 / 13:01 / 13:35)',
-          location: '八甲田丸',
-          expenseAmount: 510,
+          location: '青森站',
+          details: '【正常版】上午青森悠閒採買\n【備案】上午八甲田補考樹冰；12:03 返青森站取行李買便當車上吃；14:44 抵盛岡銜接 15:00 專車',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         lunch: {
-          restaurant: '盛樓閣冷麵燒肉午餐 (12:55 盛岡站前)',
-          location: '盛樓閣 盛岡冷麵',
-          expenseAmount: 10000,
+          restaurant: '盛樓閣 冷麵燒肉',
+          location: '盛樓閣',
+          details: '12:55 盛樓閣冷麵燒肉午餐 (若走備案則為車上便當)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         afternoon: {
-          details: '開運橋岩手山雪景遠眺散策 -> 前往盛岡つなぎ溫泉',
-          location: '盛岡開運橋',
+          location: '開運橋',
+          details: '14:35 開運橋岩手山雪景\n15:00 盛岡站西口專車直達溫泉',
           expenseAmount: 0,
           currency: 'JPY'
         },
         dinner: {
-          restaurant: '飯店一泊二食會席料理 + 地酒品酩',
-          location: '飯店內餐廳',
-          expenseAmount: 2000,
+          restaurant: '飯店岩手地產會席',
+          location: 'ホテル紫苑',
+          details: '岩手地產會席料理',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         evening: {
-          details: '南部曲屋露天風呂泡湯 放鬆身心',
-          location: '紫苑 南部曲屋露天風呂',
+          location: 'ホテル紫苑',
+          details: '盛岡つなぎ溫泉 ホテル紫苑；南部曲屋露天風呂泡湯',
           expenseAmount: 0,
           currency: 'JPY'
         },
         accommodation: {
           name: '盛岡つなぎ溫泉 ホテル紫苑',
-          roomType: '和洋室一泊二食',
-          notes: '岩手產會席料理 含接送專車',
-          expenseAmount: 43990,
+          roomType: '溫泉和室',
+          notes: '含早晚餐 專車接送',
+          details: '盛岡つなぎ溫泉 ホテル紫苑；南部曲屋露天風呂；岩手地產會席',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         miscellaneous: {
-          notes: '盛岡手工藝村紀念品',
-          expenseAmount: 2500,
+          notes: '溫泉入湯稅與伴手禮',
+          details: '',
+          expenseAmount: 0,
+          currency: 'JPY'
+        }
+      },
+      {
+        dayIndex: 4,
+        date: '2026-12-29 (二)',
+        transit: {
+          trainCode: 'こまち 7號/34號 直通仙台',
+          timeRange: '09:50-18:29',
+          duration: '4h 10m (250分)',
+          details: '09:50-10:15 (紫苑專車 25m)\n10:57-11:41 (こまち 7號 盛岡->角館 44m)\n14:58-15:11 (こまち 28/32號 角館->田澤湖 13m)\n15:25-16:56 (田澤湖一周巴士 91m)\n17:12-18:29 (こまち 34號 田澤湖->仙台 77m 直通免轉車)\n當日總車程: 4h 10m (250分)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        morning: {
+          location: '盛岡站',
+          details: '晨湯退房至盛岡寄行李\n10:57出發 11:41抵角館搭計程車\n12:00準時入席櫻之里 (已預約)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        lunch: {
+          restaurant: '櫻之里 (已預約)',
+          location: '櫻之里',
+          details: '12:00 準時入席櫻之里 (已預約 比內地雞親子丼/稻庭烏龍麵)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        afternoon: {
+          location: '角館',
+          details: '武家屋敷散策至 14:45\n15:25 田澤湖一周巴士拍辰子像\n搭こまち 34號直通直達仙台',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        dinner: {
+          restaurant: '仙台炭火厚切牛舌',
+          location: '仙台站',
+          details: '18:45 仙台炭火厚切牛舌晚餐',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        evening: {
+          location: '仙台市區飯店',
+          details: '抵達仙台市區飯店辦理入住手續並休息',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        accommodation: {
+          name: '仙台市區飯店',
+          roomType: '雙人房',
+          notes: '連泊第 1 晚 近車站',
+          details: '仙台市區飯店 (連泊1)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        miscellaneous: {
+          notes: '寄物櫃與田澤湖巴士券',
+          details: '',
+          expenseAmount: 0,
           currency: 'JPY'
         }
       },
       {
         dayIndex: 5,
-        date: '2026-12-29 (二)',
+        date: '2026-12-30 (三)',
         transit: {
-          trainCode: '秋田新幹線 こまち (盛岡->角館) 45m',
-          timeRange: '09:50-10:35',
-          backupPlan: '新幹線田澤湖線轉搭巴士',
-          duration: '1h 30m',
-          expenseAmount: 2500,
+          trainCode: 'やまびこ 50號 / 磐越西線 / 計程車跳表',
+          timeRange: '08:20-17:39',
+          duration: '4h 16m (256分)',
+          details: '08:20-08:55 (やまびこ 50號 仙台->郡山 35m)\n09:15-10:31 (磐越西線普通 郡山->會津若松 76m)\n10:35-10:45 (計程車① 車站->飯盛山 10m)\n11:45-11:58 (計程車② 飯盛山->鶴城 13m)\n12:40-12:45 (計程車③ 鶴城->市役所 5m)\n15:00-15:10 (計程車④ 末廣酒造->若松站 10m)\n15:30-16:35 (磐越西線快速 若松->郡山 65m)\n16:57-17:39 (やまびこ 67號 郡山->仙台 42m)\n當日總車程: 4h 16m (256分)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         morning: {
-          details: '角館武家屋敷歷史雪景散策',
-          location: '角館武家屋敷',
-          expenseAmount: 500,
+          location: '飯盛山',
+          details: '08:20 晚出門充裕睡眠出發\n計程車機動跳表直達核心景點:\n飯盛山＆榮螺堂 (10:55-11:45)\n計程車直達鶴城本丸拍雪見天守 (11:58-12:40)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         lunch: {
-          restaurant: '櫻の里 比內地雞親子丼 12:00',
-          location: '櫻の里 角館',
-          expenseAmount: 8000,
+          restaurant: '會津醬汁豬排丼 或 田季野輪箱飯',
+          location: '田季野輪箱飯',
+          details: '午餐: 市役所/神明通周邊 (會津醬汁豬排丼 或 田季野輪箱飯，12:50-13:55)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         afternoon: {
-          details: '田澤湖琉璃之眼搭環湖巴士巡禮',
-          location: '田澤湖たつこ像',
-          expenseAmount: 1200,
+          location: '末廣酒造',
+          details: '野口英世青春通洋館漫步 ＆ 末廣酒造嘉永藏 (清酒試飲採買，13:55-15:00)\n15:00 計程車直達車站採買伴手禮\n15:30 搭快速車返程',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         dinner: {
-          restaurant: '牛舌 善治郎 站內/驛前 20:00',
-          location: '仙台 善治郎',
-          expenseAmount: 14000,
+          restaurant: '仙台在地美食料理',
+          location: '仙台站',
+          details: '晚餐: 仙台在地美食料理',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         evening: {
-          details: '抵達仙台市區 Check-in 與商店街夜逛',
-          location: '仙台車站前商店街',
+          location: '定禪寺通',
+          details: '17:39 準時返抵仙台站 (達成18:00前目標！)\n定禪寺通「SENDAI光之樂章」百萬點燈散策',
           expenseAmount: 0,
           currency: 'JPY'
         },
         accommodation: {
-          name: '仙台 Daiwa / 大都會東館',
-          roomType: '標準雙人客房',
-          notes: '仙台車站直通商務景觀飯店',
-          expenseAmount: 32000,
+          name: '仙台市區飯店',
+          roomType: '雙人房',
+          notes: '連泊第 2 晚',
+          details: '仙台市區飯店 (連泊2)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         miscellaneous: {
-          notes: '毛豆泥奶昔與伴手禮盒',
-          expenseAmount: 3000,
+          notes: '末廣酒造伴手禮',
+          details: '清酒與當地工藝品採買',
+          expenseAmount: 0,
           currency: 'JPY'
         }
-      }
-    ]
-  },
-  {
-    id: 'trip-kyoto-2025-archived',
-    name: '2025 京都秋季紅葉古寺攝影 6日遊 (歷史紀錄)',
-    startDate: '2025-11-20',
-    endDate: '2025-11-25',
-    exchangeRate: 0.212,
-    currencyName: 'JPY',
-    isArchived: true, // 歷史封存紀錄，展示反灰收納效果
-    airfareAmount: 18500,
-    airfareCurrency: 'TWD',
-    days: [
+      },
       {
-        dayIndex: 1,
-        date: '2025-11-20 (四)',
+        dayIndex: 6,
+        date: '2026-12-31 (四)',
         transit: {
-          trainCode: 'HARUKA 關空特急',
-          timeRange: '13:14-14:34',
-          backupPlan: '利木津巴士直達京都',
-          duration: '1h 20m',
-          expenseAmount: 4200,
+          trainCode: 'やまびこ 51/54號 / 計程車包車 / はやぶさ 38號',
+          timeRange: '08:00-20:48',
+          duration: '2h 38m (158分)',
+          details: '08:00-08:35 (やまびこ 51號 仙台->一之關 35m)\n08:40-11:35 (計程車包車約3h 09:30猊鼻溪遊船直返車站)\n11:51-12:23 (やまびこ 54號 一之關->仙台 32m)\n19:17-20:48 (はやぶさ 38號 仙台->東京 91m)\n當日總車程: 2h 38m (158分)',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         morning: {
-          details: '台北桃園出發直飛關西國際機場',
-          location: '桃園國際機場',
+          location: '猊鼻溪',
+          details: '退房寄放大行李於仙台飯店\n輕裝出門 09:30-11:00 猊鼻溪暖桌遊船',
           expenseAmount: 0,
-          currency: 'TWD'
+          currency: 'JPY'
         },
         lunch: {
-          restaurant: '關空航廈美食街',
-          location: '關西國際機場',
-          expenseAmount: 2800,
+          restaurant: '仙台站內 / S-PAL 美食街',
+          location: '仙台站',
+          details: '12:23 提早返抵仙台享有充裕留白逛街採買伴手禮與 S-PAL 午餐',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         afternoon: {
-          details: '抵達京都站辦理入住，漫步東本願寺銀杏大道',
-          location: '東本願寺',
+          location: '仙台站',
+          details: '仙台市區逛街採買名產伴手禮與 S-PAL\n傍晚回飯店取行李\n19:17 搭最速はやぶさ直奔東京 (20:48抵)',
           expenseAmount: 0,
           currency: 'JPY'
         },
         dinner: {
-          restaurant: '名代豬排 かつくら 京都車站店',
-          location: '京都車站 The Cube',
-          expenseAmount: 5200,
+          restaurant: '新幹線便當 或 東京跨年宵夜',
+          location: '東京濱松町名鐵飯店',
+          details: '晚餐: 仙台站頂級牛舌便當或抵達東京後居酒屋宵夜',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         evening: {
-          details: '京都塔夜景與地下街名產散策',
-          location: '京都塔',
-          expenseAmount: 900,
+          location: '東京濱松町名鐵飯店',
+          details: '20:48 抵達東京辦理入住\n迎接跨年夜看 NHK 紅白歌合戰',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         accommodation: {
-          name: '京都千飯店 (THE THOUSAND KYOTO)',
-          roomType: '高級客房',
-          notes: '京都站中央口步行 2 分鐘',
-          expenseAmount: 42000,
+          name: '東京濱松町名鐵飯店',
+          roomType: '雙人房',
+          notes: '連泊第 1 晚 近羽田與JR',
+          details: '東京濱松町名鐵飯店 (連泊1)；迎接跨年夜看紅白',
+          expenseAmount: 0,
           currency: 'JPY'
         },
         miscellaneous: {
-          notes: 'ICOCA 交通卡充值',
-          expenseAmount: 3000,
+          notes: '跨年零食與計程車包車費用',
+          details: '',
+          expenseAmount: 0,
+          currency: 'JPY'
+        }
+      },
+      {
+        dayIndex: 7,
+        date: '2027-01-01 (五)',
+        transit: {
+          trainCode: 'とき 315號 / 344號 (東京往返越後湯澤)',
+          timeRange: '10:15-20:24',
+          duration: '2h 36m (156分)',
+          details: '10:15-11:31 (とき 315號 東京->越後湯澤 76m)\n19:04-20:24 (とき 344號 越後湯澤->東京 80m) [備案: 19:48-21:04 とき 346號]\n當日總車程: 2h 36m (156分)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        morning: {
+          location: '越後湯澤',
+          details: '東京出發日歸新潟雪國 (11:31 抵達越後湯澤)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        lunch: {
+          restaurant: 'むらんごっつぉ (Murangozzo)',
+          location: 'むらんごっつぉ',
+          details: '11:40 むらんごっつぉ午餐大餐 (新潟在地魚沼米與旬味料理)',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        afternoon: {
+          location: '湯澤高原',
+          details: '13:30-15:30 湯澤高原纜車山頂雪景\n15:45-16:45 日歸名湯 (首選東映飯店 / 酒風呂保底)\n16:45-17:45 CoCoLo 採買 ＆ ぽんしゅ館清酒試飲',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        dinner: {
+          restaurant: '中野屋 片木蕎麥麵',
+          location: '中野屋',
+          details: '17:45-18:45 中野屋片木蕎麥麵晚餐；搭 19:04 新幹線回東京',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        evening: {
+          location: '東京濱松町名鐵飯店',
+          details: '20:24 早早返抵東京休息；圓滿結束東北雪國跨年之旅',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        accommodation: {
+          name: '東京濱松町名鐵飯店',
+          roomType: '雙人房',
+          notes: '連泊第 2 晚',
+          details: '東京濱松町名鐵飯店 (連泊2)；圓滿結束東北雪國跨年之旅',
+          expenseAmount: 0,
+          currency: 'JPY'
+        },
+        miscellaneous: {
+          notes: 'ぽんしゅ館代幣與雪國土產',
+          details: '',
+          expenseAmount: 0,
           currency: 'JPY'
         }
       }
