@@ -197,14 +197,18 @@ function App() {
       <GoogleDriveSyncModal
         isOpen={isGDriveModalOpen}
         onClose={() => setIsGDriveModalOpen(false)}
-        trips={trips}
-        onRestoreTrips={(restoredTrips) => {
-          if (Array.isArray(restoredTrips) && restoredTrips.length > 0) {
-            setTrips(restoredTrips);
-            setActiveTripId(restoredTrips[0].id);
-          } else if (restoredTrips && restoredTrips.id) {
-            setTrips([restoredTrips]);
-            setActiveTripId(restoredTrips.id);
+        activeTrip={activeTrip}
+        onRestoreTrip={(restoredTrip) => {
+          if (!restoredTrip) return;
+          setTrips(prev => {
+            const exists = prev.some(t => t.id === restoredTrip.id || t.name === restoredTrip.name);
+            if (exists) {
+              return prev.map(t => (t.id === restoredTrip.id || t.name === restoredTrip.name) ? restoredTrip : t);
+            }
+            return [restoredTrip, ...prev];
+          });
+          if (restoredTrip.id) {
+            setActiveTripId(restoredTrip.id);
           }
         }}
       />

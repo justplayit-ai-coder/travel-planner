@@ -1,4 +1,4 @@
-// Google Drive 同步處理工具（透過 Google Apps Script Web App）
+// Google Drive 獨立行程同步工具（每個旅遊行程獨立檔案）
 
 const G_DRIVE_STORAGE_KEY = 'travel_planner_gdrive_url';
 const G_DRIVE_LAST_SYNC_KEY = 'travel_planner_gdrive_last_sync';
@@ -33,22 +33,25 @@ export const saveAutoSyncSetting = (enabled) => {
   localStorage.setItem(G_DRIVE_AUTO_SYNC_KEY, enabled ? 'true' : 'false');
 };
 
-// 上傳旅程資料至 Google Drive
-export const uploadTripToGoogleDrive = async (tripsData, scriptUrl) => {
+// 上傳單一獨立旅程資料至 Google Drive (以該旅程名稱獨立建立或覆蓋)
+export const uploadSingleTripToGoogleDrive = async (tripData, scriptUrl) => {
   const targetUrl = scriptUrl || getSavedGDriveUrl();
   if (!targetUrl) {
     throw new Error('尚未設定 Google Apps Script 網頁應用程式網址');
   }
 
+  const cleanName = (tripData.name || '未命名旅程').replace(/[\/\\:*?"<>|]/g, '_').trim();
+  const fileName = `${cleanName}.json`;
+
   const payload = {
     action: 'save',
-    version: '1.0.0',
+    tripName: cleanName,
+    fileName: fileName,
     savedAt: new Date().toISOString(),
-    data: tripsData
+    data: tripData
   };
 
   try {
-    // 使用 text/plain 發送避免觸發 CORS 預檢限制，GAS 可自 e.postData.contents 完整解析
     const response = await fetch(targetUrl, {
       method: 'POST',
       headers: {
@@ -61,18 +64,24 @@ export const uploadTripToGoogleDrive = async (tripsData, scriptUrl) => {
     if (result.status === 'success' || result.result === 'success') {
       const nowStr = new Date().toLocaleString('zh-TW');
       localStorage.setItem(G_DRIVE_LAST_SYNC_KEY, nowStr);
-      return { success: true, timestamp: nowStr, fileId: result.fileId, url: result.fileUrl };
+      return { 
+        success: true, 
+        timestamp: nowStr, 
+        fileName: result.fileName || fileName,
+        fileId: result.fileId, 
+        url: result.fileUrl 
+      };
     } else {
       throw new Error(result.error || result.message || '儲存失敗');
     }
   } catch (err) {
-    console.error('Google Drive 上傳失敗:', err);
+    console.error('Google Drive 單一行程上傳失敗:', err);
     throw err;
   }
 };
 
-// 從 Google Drive 下載旅程資料
-export const downloadTripFromGoogleDrive = async (scriptUrl) => {
+// 從 Google Drive 下載指定或當前行程資料
+export const downloadSingleTripFromGoogleDrive = async (tripName, scriptUrl) => {
   const targetUrl = scriptUrl || getSavedGDriveUrl();
   if (!targetUrl) {
     throw new Error('尚未設定 Google Apps Script 網頁應用程式網址');
@@ -80,24 +89,47 @@ export const downloadTripFromGoogleDrive = async (scriptUrl) => {
 
   try {
     const separator = targetUrl.includes('?') ? '&' : '?';
-    const response = await fetch(`${targetUrl}${separator}action=read&t=${Date.now()}`);
+    const cleanName = tripName ? encodeURIComponent(tripName.replace(/[\/\\:*?"<>|]/g, '_').trim()) : '';
+    const url = `${targetUrl}${separator}action=read&tripName=${cleanName}&t=${Date.now()}`;
+    
+    const response = await fetch(url);
     const result = await response.json();
 
     if (result.status === 'error' || result.error) {
-      throw new Error(result.error || '找不到雲端備份檔案');
+      throw new Error(result.message || result.error || '找不到該旅程之雲端檔案');
     }
 
-    const tripsData = result.data || result;
+    const tripData = result.data || result;
     const nowStr = new Date().toLocaleString('zh-TW');
     localStorage.setItem(G_DRIVE_LAST_SYNC_KEY, nowStr);
 
     return {
       success: true,
-      data: tripsData,
+      data: tripData,
+      fileName: result.fileName,
       timestamp: nowStr
     };
   } catch (err) {
-    console.error('Google Drive 下載失敗:', err);
+    console.error('Google Drive 單一行程下載失敗:', err);
     throw err;
+  }
+};
+
+// 取得雲端目錄中現有的所有獨立旅程清單
+export const listGoogleDriveTrips = async (scriptUrl) => {
+  const targetUrl = scriptUrl || getSavedGDriveUrl();
+  if (!targetUrl) return [];
+
+  try {
+    const separator = targetUrl.includes('?') ? '&' : '?';
+    const response = await fetch(`${targetUrl}${separator}action=list&t=${Date.now()}`);
+    const result = await response.json();
+    if (result.status === 'success' && Array.isArray(result.trips)) {
+      return result.trips;
+    }
+    return [];
+  } catch (err) {
+    console.warn('無法取得雲端檔案清單:', err);
+    return [];
   }
 };
