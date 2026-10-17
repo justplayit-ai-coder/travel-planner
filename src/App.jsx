@@ -7,6 +7,7 @@ import ItineraryTable from './components/ItineraryTable';
 import LeafletMapVisualizer from './components/LeafletMapVisualizer';
 import AIAssistantModal from './components/AIAssistantModal';
 import ImportCSVModal from './components/ImportCSVModal';
+import GoogleDriveSyncModal from './components/GoogleDriveSyncModal';
 
 function App() {
   // 1. 金鑰密碼驗證狀態
@@ -44,6 +45,7 @@ function App() {
   // 彈窗開關狀態
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isImportCSVOpen, setIsImportCSVOpen] = useState(false);
+  const [isGDriveModalOpen, setIsGDriveModalOpen] = useState(false);
 
   // 同步儲存至 LocalStorage
   useEffect(() => {
@@ -142,6 +144,7 @@ function App() {
             onUpdateTrip={handleUpdateCurrentTrip}
             onOpenImportCSV={() => setIsImportCSVOpen(true)}
             onOpenAIModal={() => setIsAIModalOpen(true)}
+            onOpenGDriveSync={() => setIsGDriveModalOpen(true)}
             isMapVisible={isMapVisible}
             onToggleMap={() => setIsMapVisible(!isMapVisible)}
           />
@@ -189,6 +192,22 @@ function App() {
           onClose={() => setIsImportCSVOpen(false)}
         />
       )}
+
+      {/* Google Drive 雲端同步設定與操作彈窗 */}
+      <GoogleDriveSyncModal
+        isOpen={isGDriveModalOpen}
+        onClose={() => setIsGDriveModalOpen(false)}
+        trips={trips}
+        onRestoreTrips={(restoredTrips) => {
+          if (Array.isArray(restoredTrips) && restoredTrips.length > 0) {
+            setTrips(restoredTrips);
+            setActiveTripId(restoredTrips[0].id);
+          } else if (restoredTrips && restoredTrips.id) {
+            setTrips([restoredTrips]);
+            setActiveTripId(restoredTrips.id);
+          }
+        }}
+      />
     </div>
   );
 }

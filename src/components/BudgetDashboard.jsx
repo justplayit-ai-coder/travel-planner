@@ -12,7 +12,8 @@ import {
   FileText, 
   Map as MapIcon, 
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Cloud
 } from 'lucide-react';
 import { calculateTripBudget } from '../utils/budgetCalculator';
 import { exportTripToCSV, downloadCSVFile, getSampleCSVTemplate } from '../utils/csvHandler';
@@ -42,6 +43,7 @@ export default function BudgetDashboard({
   onUpdateTrip,
   onOpenImportCSV,
   onOpenAIModal,
+  onOpenGDriveSync,
   isMapVisible,
   onToggleMap
 }) {
@@ -199,6 +201,11 @@ export default function BudgetDashboard({
           <button onClick={onOpenImportCSV} className="btn btn-secondary" title="匯入 CSV 建立行程">
             <Upload size={16} />
             <span>匯入 CSV</span>
+          </button>
+
+          <button onClick={onOpenGDriveSync} className="btn btn-secondary gdrive-sync-btn" title="Google 雲端硬碟備份與還原">
+            <Cloud size={16} className="text-primary" />
+            <span>雲端同步</span>
           </button>
 
           <button onClick={onOpenAIModal} className="btn btn-ai-sparkle" title="AI 助理 (健檢 / 微調 / 簡報)">
