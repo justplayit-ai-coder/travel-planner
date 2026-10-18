@@ -26,6 +26,7 @@ export default function ItineraryTable({
   const currencyName = trip.currencyName || 'JPY';
   const exchangeRate = trip.exchangeRate || 0.205;
   const [draggedIndex, setDraggedIndex] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   // 規範外幣代碼：若不是 TWD 則一律以目前頂部選定的主要外幣為依據
   const getNormalizedCurrency = (cur) => {
@@ -158,16 +159,21 @@ export default function ItineraryTable({
     }
   };
 
-  // 刪除一天
-  const handleDeleteDay = (dayIndex) => {
-    if (trip.days.length <= 1) {
+  // 刪除一天 (依據物理陣列索引刪除，徹底避免型別或字串比對不一致問題)
+  const handleDeleteDayByIndex = (indexToDelete) => {
+    if (!trip.days || trip.days.length <= 1) {
       alert('旅程至少需保留一天');
       return;
     }
     const filtered = trip.days
-      .filter(d => d.dayIndex !== dayIndex)
+      .filter((_, idx) => idx !== indexToDelete)
       .map((d, idx) => ({ ...d, dayIndex: idx + 1 }));
+
     onUpdateTrip({ ...trip, days: filtered });
+
+    if (onSelectDay) {
+      onSelectDay(Math.min(activeDayIndex || 1, filtered.length));
+    }
   };
 
   return (
@@ -282,11 +288,11 @@ export default function ItineraryTable({
                   {/* 刪除此天按鈕 */}
                   {trip.days.length > 1 && (
                     <button
+                      type="button"
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
-                        if (window.confirm(`確定要刪除第 ${day.dayIndex} 天嗎？`)) {
-                          handleDeleteDay(day.dayIndex);
-                        }
+                        handleDeleteDayByIndex(index);
                       }}
                       className="btn-icon delete-day-btn"
                       title="刪除此天"

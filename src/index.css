@@ -2194,6 +2194,28 @@ body {
   50% { opacity: 1; }
 }
 
+.btn-icon.delete-day-btn.confirming-delete {
+  width: auto;
+  padding: 2px 8px;
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+  animation: pulseDelete 1s infinite alternate;
+}
+
+.confirm-delete-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  color: #fecaca;
+}
+
+@keyframes pulseDelete {
+  from { background: rgba(239, 68, 68, 0.2); }
+  to { background: rgba(239, 68, 68, 0.4); }
+}
+
+
 
 
 

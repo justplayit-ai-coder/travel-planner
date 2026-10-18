@@ -37,9 +37,10 @@ export const extractLocationKeywords = (text) => {
   if (!text || typeof text !== 'string') return [];
 
   const candidates = [];
-  // 1. 依行、分號、逗號、括號、箭頭切分
+  // 1. 依行、分號、逗號、括號、箭頭切分 (連字號置於集合末尾，符合 ECMAScript 規範)
   const segments = text
-    .split(/[\n;；,，->→+&＆/]/)
+    .replace(/->|→/g, '\n')
+    .split(/[\n;；,，+&＆/-]/)
     .map(s => s.trim())
     .filter(Boolean);
 
