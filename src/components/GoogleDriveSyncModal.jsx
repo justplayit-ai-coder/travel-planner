@@ -12,7 +12,8 @@ import {
   FolderLock,
   FileCode,
   FileText,
-  ListFilter
+  ListFilter,
+  HelpCircle
 } from 'lucide-react';
 import { 
   getSavedGDriveUrl, 
@@ -22,40 +23,50 @@ import {
   listGoogleDriveTrips,
   getLastSyncTime,
   getAutoSyncSetting,
-  saveAutoSyncSetting
+  saveAutoSyncSetting,
+  sanitizeFileName
 } from '../utils/googleDriveSync';
 
 export const TARGET_FOLDER_ID = '1yi7a4WjqcOstiWWDH9KixKpb2ZRgDrDG';
 export const TARGET_FOLDER_URL = `https://drive.google.com/drive/folders/${TARGET_FOLDER_ID}`;
 
-export const GAS_CODE_SNIPPET = `// Google Apps Script：獨立行程檔案同步伺服端程式碼
+export const GAS_CODE_SNIPPET = `// Google Apps Script：獨立行程檔案同步伺服端程式碼 (無死角支援自訂檔名)
 const TARGET_FOLDER_ID = "${TARGET_FOLDER_ID}";
 
 function doPost(e) {
   try {
-    const payload = JSON.parse(e.postData.contents);
+    let payload = {};
+    if (e.postData && e.postData.contents) {
+      try { payload = JSON.parse(e.postData.contents); } catch (ex) {}
+    }
+
+    // 優先順序：URL 參數 > Payload 檔名 > 旅程名稱
+    let rawName = (e.parameter && (e.parameter.fileName || e.parameter.tripName))
+               || payload.fileName 
+               || payload.tripName 
+               || (payload.data && payload.data.name) 
+               || "travel-plan";
+
+    let cleanName = (rawName + "").replace(/[\\\\/:*?"<>|]/g, "_").trim();
+    if (!cleanName) cleanName = "trip";
+    if (!cleanName.toLowerCase().endsWith(".json")) cleanName += ".json";
+
     const folder = DriveApp.getFolderById(TARGET_FOLDER_ID);
-    
-    // 依據各旅程名稱建立獨立檔案（例如：東北雪之聖誕與東京跨年之旅.json）
-    let rawName = payload.tripName || (payload.data && payload.data.name) || "travel-plan";
-    let safeName = rawName.replace(/[/\\\\:*?"<>|]/g, "_").trim();
-    if (!safeName.endsWith(".json")) safeName += ".json";
-    
-    const files = folder.getFilesByName(safeName);
+    const files = folder.getFilesByName(cleanName);
     let file;
     const fileContent = JSON.stringify(payload.data || payload, null, 2);
-    
-    // 存在則覆蓋更新該旅程主檔，不存在則建立新檔
+
+    // 存在同名獨立檔案則覆蓋更新，不存在則建立新檔案
     if (files.hasNext()) {
       file = files.next();
       file.setContent(fileContent);
     } else {
-      file = folder.createFile(safeName, fileContent, MimeType.PLAIN_TEXT);
+      file = folder.createFile(cleanName, fileContent, MimeType.PLAIN_TEXT);
     }
-    
+
     return ContentService.createTextOutput(JSON.stringify({
       status: "success",
-      fileName: safeName,
+      fileName: cleanName,
       fileId: file.getId(),
       fileUrl: file.getUrl(),
       updatedAt: new Date().toISOString()
@@ -71,17 +82,17 @@ function doPost(e) {
 function doGet(e) {
   try {
     const folder = DriveApp.getFolderById(TARGET_FOLDER_ID);
-    const action = e.parameter.action;
-    
-    // 動作 1：列出目錄下所有已儲存的獨立旅程檔案
+    const action = e.parameter ? e.parameter.action : "";
+
+    // 動作 1：列出目錄中所有已存在的獨立行程 .json 檔案
     if (action === "list") {
       const files = folder.getFiles();
       const list = [];
       while (files.hasNext()) {
         const f = files.next();
-        if (f.getName().endsWith(".json")) {
+        if (f.getName().toLowerCase().endsWith(".json")) {
           list.push({
-            name: f.getName().replace(/\\.json$/, ""),
+            name: f.getName().replace(/\\.json$/i, ""),
             fileName: f.getName(),
             fileId: f.getId(),
             updatedAt: f.getLastUpdated().toISOString()
@@ -93,26 +104,18 @@ function doGet(e) {
         trips: list
       })).setMimeType(ContentService.MimeType.JSON);
     }
-    
-    // 動作 2：下載指定旅程主檔
-    let reqName = e.parameter.tripName || "";
-    if (reqName && !reqName.endsWith(".json")) reqName += ".json";
-    
+
+    // 動作 2：下載指定檔名之旅程
+    let reqName = (e.parameter && (e.parameter.fileName || e.parameter.tripName)) || "";
+    let cleanName = (reqName + "").replace(/[\\\\/:*?"<>|]/g, "_").trim();
+    if (cleanName && !cleanName.toLowerCase().endsWith(".json")) cleanName += ".json";
+
     let targetFile = null;
-    if (reqName) {
-      const matched = folder.getFilesByName(reqName);
+    if (cleanName) {
+      const matched = folder.getFilesByName(cleanName);
       if (matched.hasNext()) targetFile = matched.next();
-    } else {
-      const allFiles = folder.getFiles();
-      while (allFiles.hasNext()) {
-        const f = allFiles.next();
-        if (f.getName().endsWith(".json")) {
-          targetFile = f;
-          break;
-        }
-      }
     }
-    
+
     if (targetFile) {
       const content = targetFile.getBlob().getDataAsString();
       return ContentService.createTextOutput(JSON.stringify({
@@ -122,10 +125,10 @@ function doGet(e) {
         updatedAt: targetFile.getLastUpdated().toISOString()
       })).setMimeType(ContentService.MimeType.JSON);
     }
-    
+
     return ContentService.createTextOutput(JSON.stringify({
       status: "error",
-      message: "指定目錄中尚未發現 " + (reqName || "任何 .json") + " 檔案"
+      message: "指定目錄中找不到檔案: " + (cleanName || "未指定檔名")
     })).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({
@@ -142,6 +145,7 @@ export default function GoogleDriveSyncModal({
   onRestoreTrip
 }) {
   const [scriptUrl, setScriptUrl] = useState(() => getSavedGDriveUrl());
+  const [customFileName, setCustomFileName] = useState('');
   const [lastSync, setLastSync] = useState(() => getLastSyncTime());
   const [autoSync, setAutoSync] = useState(() => getAutoSyncSetting());
   const [statusMessage, setStatusMessage] = useState(null);
@@ -151,10 +155,14 @@ export default function GoogleDriveSyncModal({
   const [remoteFiles, setRemoteFiles] = useState([]);
   const [isLoadingList, setIsLoadingList] = useState(false);
 
-  // 當前欲同步之獨立檔案名稱
-  const currentFileName = activeTrip ? `${(activeTrip.name || 'travel-plan').replace(/[\/\\:*?"<>|]/g, '_')}.json` : 'travel-plan.json';
+  // 當切換旅程時，自動更新預設自訂檔名
+  useEffect(() => {
+    if (activeTrip && activeTrip.name) {
+      setCustomFileName(sanitizeFileName(activeTrip.name));
+    }
+  }, [activeTrip?.name]);
 
-  // 嘗試載入雲端現有檔案列表
+  // 開啟彈窗時自動檢查雲端已有之檔案清單
   useEffect(() => {
     if (isOpen && scriptUrl) {
       loadRemoteFiles();
@@ -202,17 +210,17 @@ export default function GoogleDriveSyncModal({
     setIsLoading(true);
     setStatusMessage(null);
     try {
-      const res = await uploadSingleTripToGoogleDrive(activeTrip, scriptUrl);
+      const res = await uploadSingleTripToGoogleDrive(activeTrip, scriptUrl, customFileName);
       setLastSync(res.timestamp);
       setStatusMessage({
         type: 'success',
-        text: `備份成功！已獨立儲存為「${res.fileName}」（${res.timestamp}）`
+        text: `備份成功！已獨立儲存為「${res.fileName}」（時間：${res.timestamp}）`
       });
       loadRemoteFiles();
     } catch (err) {
       setStatusMessage({
         type: 'error',
-        text: `上傳失敗：${err.message || '請確認 Web App 網址與存取權限是否設定為「所有人」'}`
+        text: `上傳失敗：${err.message || '請確認 Web App 網址是否正確，且存取權限是否設為所有人'}`
       });
     } finally {
       setIsLoading(false);
@@ -220,7 +228,7 @@ export default function GoogleDriveSyncModal({
   };
 
   // 下載還原指定或當前行程
-  const handleDownloadSpecific = async (targetTripName) => {
+  const handleDownloadSpecific = async (targetFileName) => {
     if (!scriptUrl) {
       setStatusMessage({ type: 'error', text: '請先填寫 Google Apps Script 網頁應用程式網址' });
       return;
@@ -229,20 +237,20 @@ export default function GoogleDriveSyncModal({
     setIsLoading(true);
     setStatusMessage(null);
     try {
-      const queryName = targetTripName || (activeTrip ? activeTrip.name : '');
-      const res = await downloadSingleTripFromGoogleDrive(queryName, scriptUrl);
+      const target = targetFileName || customFileName;
+      const res = await downloadSingleTripFromGoogleDrive(target, scriptUrl);
       if (res.data) {
         onRestoreTrip(res.data);
         setLastSync(res.timestamp);
         setStatusMessage({
           type: 'success',
-          text: `還原成功！已自「${res.fileName || queryName}」載入最新行程（${res.timestamp}）`
+          text: `還原成功！已成功載入「${res.fileName || target}」（時間：${res.timestamp}）`
         });
       }
     } catch (err) {
       setStatusMessage({
         type: 'error',
-        text: `下載還原失敗：${err.message || '請確認該行程檔案是否存在於雲端目錄中'}`
+        text: `下載還原失敗：${err.message || '雲端目錄中未找到該檔案'}`
       });
     } finally {
       setIsLoading(false);
@@ -271,12 +279,12 @@ export default function GoogleDriveSyncModal({
 
         {/* Modal 內容區 */}
         <div className="modal-body-content">
-          {/* 指定目錄與獨立檔案標示 */}
+          {/* 指定目錄標示 */}
           <div className="gdrive-folder-pill">
             <div className="folder-pill-left">
               <FolderLock size={16} className="text-primary" />
               <div className="folder-text-group">
-                <span className="folder-tag">指定目錄：</span>
+                <span className="folder-tag">指定儲存目錄：</span>
                 <span className="folder-id-code">{TARGET_FOLDER_ID}</span>
               </div>
             </div>
@@ -291,26 +299,39 @@ export default function GoogleDriveSyncModal({
             </a>
           </div>
 
-          {/* 當前旅程獨立主檔名稱提示 */}
-          <div className="current-trip-target-banner">
-            <FileText size={15} className="text-secondary" />
-            <span>當前操作行程之獨立主檔：</span>
-            <strong className="text-accent">{currentFileName}</strong>
+          {/* 當前行程之檔案名稱設定列 */}
+          <div className="gdrive-file-naming-card">
+            <div className="naming-label-row">
+              <div className="naming-title">
+                <FileText size={15} className="text-primary" />
+                <span>本次同步之獨立檔案名稱：</span>
+              </div>
+              <span className="naming-hint">各行程自動獨立檔案，絕不混淆覆蓋</span>
+            </div>
+            <div className="file-name-input-row">
+              <input 
+                type="text" 
+                value={customFileName}
+                onChange={e => setCustomFileName(e.target.value)}
+                placeholder="例如: 東北雪之聖誕與東京跨年之旅.json"
+                className="custom-filename-input"
+              />
+            </div>
           </div>
 
           {/* Web App URL 設定列 */}
           <div className="gdrive-input-section">
-            <label className="gdrive-label">
+            <div className="gdrive-label">
               <span>Google Apps Script 網頁應用程式網址 (Web App URL)：</span>
               <button 
                 type="button" 
                 onClick={() => setShowCodeGuide(!showCodeGuide)}
                 className="guide-toggle-btn"
               >
-                <FileCode size={13} />
-                <span>{showCodeGuide ? '隱藏部署步驟' : '如何取得此網址？'}</span>
+                <HelpCircle size={13} />
+                <span>{showCodeGuide ? '收起部署指南' : '程式碼更新重要提示'}</span>
               </button>
-            </label>
+            </div>
             <div className="url-input-wrap">
               <input 
                 type="text"
@@ -333,20 +354,23 @@ export default function GoogleDriveSyncModal({
           {showCodeGuide && (
             <div className="gdrive-deploy-guide glass-card">
               <div className="guide-header">
-                <strong>快速取得 Web App 網址 4 步驟（已設定各行程獨立主檔）：</strong>
+                <strong className="text-warning">為什麼之前會覆蓋同一個檔案？</strong>
                 <button 
                   onClick={handleCopyCode} 
                   className="btn btn-sm btn-primary copy-code-btn"
                 >
                   <Copy size={13} />
-                  <span>{copied ? '已複製程式碼' : '複製 Apps Script 程式碼'}</span>
+                  <span>{copied ? '已複製新程式碼' : '複製最新 Apps Script 程式碼'}</span>
                 </button>
               </div>
+              <p className="guide-explanation">
+                Google Apps Script 在編輯存檔後，<strong>舊網址仍會繼續跑第一版的舊快取</strong>。請依照下方步驟點擊「新部署」才能讓新程式碼生效：
+              </p>
               <ol className="guide-steps-list">
-                <li>前往上方連結進入指定的 Google Drive 資料夾。</li>
-                <li>點擊左上角「新增」 &gt;「更多」 &gt;「Google Apps Script」。</li>
-                <li>清空預設文字並貼入已複製之專屬程式碼（自動支援依行程名稱分檔）。</li>
-                <li>點擊右上角「部署」 &gt;「新部署」：種類選「網頁應用程式」，「誰可以存取」務必選取「<strong>所有人</strong>」，點擊部署後將產生的 Web app URL 貼至上方欄位即可。</li>
+                <li>進入 Apps Script 貼上最新程式碼並按儲存。</li>
+                <li>點擊右上角「<strong>部署</strong>」 &gt;「<strong>新部署</strong>」（請勿只按管理部署）。</li>
+                <li>確認類型為「網頁應用程式」，「誰可以存取」為「<strong>所有人</strong>」。</li>
+                <li>點擊「部署」，複製<strong>新產生的網址</strong>貼回上方欄位即可！</li>
               </ol>
             </div>
           )}
@@ -359,7 +383,7 @@ export default function GoogleDriveSyncModal({
               className="btn btn-primary sync-action-btn"
             >
               {isLoading ? <RefreshCw size={16} className="spin-icon" /> : <UploadCloud size={16} />}
-              <span>備份當前行程至獨立主檔</span>
+              <span>獨立備份此行程至雲端</span>
             </button>
 
             <button 
@@ -368,7 +392,7 @@ export default function GoogleDriveSyncModal({
               className="btn btn-secondary sync-action-btn"
             >
               {isLoading ? <RefreshCw size={16} className="spin-icon" /> : <DownloadCloud size={16} />}
-              <span>還原當前行程最新版本</span>
+              <span>從雲端下載還原此行程</span>
             </button>
           </div>
 
@@ -377,17 +401,19 @@ export default function GoogleDriveSyncModal({
             <div className="remote-trips-section">
               <div className="remote-section-title">
                 <ListFilter size={14} />
-                <span>雲端資料夾中已儲存的行程列表 (點擊可直接載入還原)：</span>
+                <span>雲端資料夾中現有的行程檔案 (點擊即可載入)：</span>
               </div>
               <div className="remote-trips-list">
                 {remoteFiles.map(rf => (
                   <div key={rf.fileId} className="remote-trip-pill">
-                    <span className="remote-trip-title">{rf.fileName}</span>
+                    <div className="remote-pill-info">
+                      <span className="remote-trip-title">{rf.fileName}</span>
+                    </div>
                     <button 
-                      onClick={() => handleDownloadSpecific(rf.name)}
+                      onClick={() => handleDownloadSpecific(rf.fileName)}
                       className="btn btn-sm btn-secondary compact-btn"
                     >
-                      載入此行程
+                      載入此檔案
                     </button>
                   </div>
                 ))}
@@ -408,7 +434,7 @@ export default function GoogleDriveSyncModal({
                 checked={autoSync} 
                 onChange={handleToggleAutoSync} 
               />
-              <span>自動定時備份當前行程</span>
+              <span>自動定時備份此行程</span>
             </label>
           </div>
 

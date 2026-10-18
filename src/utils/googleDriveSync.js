@@ -33,26 +33,36 @@ export const saveAutoSyncSetting = (enabled) => {
   localStorage.setItem(G_DRIVE_AUTO_SYNC_KEY, enabled ? 'true' : 'false');
 };
 
+// 格式化安全檔名
+export const sanitizeFileName = (name) => {
+  const base = (name || '未命名旅程').replace(/[\/\\:*?"<>|]/g, '_').trim();
+  return base.endsWith('.json') ? base : `${base}.json`;
+};
+
 // 上傳單一獨立旅程資料至 Google Drive (以該旅程名稱獨立建立或覆蓋)
-export const uploadSingleTripToGoogleDrive = async (tripData, scriptUrl) => {
+export const uploadSingleTripToGoogleDrive = async (tripData, scriptUrl, specifiedFileName = '') => {
   const targetUrl = scriptUrl || getSavedGDriveUrl();
   if (!targetUrl) {
     throw new Error('尚未設定 Google Apps Script 網頁應用程式網址');
   }
 
-  const cleanName = (tripData.name || '未命名旅程').replace(/[\/\\:*?"<>|]/g, '_').trim();
-  const fileName = `${cleanName}.json`;
+  const fileName = specifiedFileName ? sanitizeFileName(specifiedFileName) : sanitizeFileName(tripData.name);
+  const tripName = fileName.replace(/\.json$/i, '');
 
   const payload = {
     action: 'save',
-    tripName: cleanName,
+    tripName: tripName,
     fileName: fileName,
     savedAt: new Date().toISOString(),
     data: tripData
   };
 
   try {
-    const response = await fetch(targetUrl, {
+    const separator = targetUrl.includes('?') ? '&' : '?';
+    // 同時在 URL Query String 與 Body Payload 傳送檔名，雙重保險
+    const postUrl = `${targetUrl}${separator}action=save&tripName=${encodeURIComponent(tripName)}&fileName=${encodeURIComponent(fileName)}`;
+
+    const response = await fetch(postUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
@@ -90,7 +100,7 @@ export const downloadSingleTripFromGoogleDrive = async (tripName, scriptUrl) => 
   try {
     const separator = targetUrl.includes('?') ? '&' : '?';
     const cleanName = tripName ? encodeURIComponent(tripName.replace(/[\/\\:*?"<>|]/g, '_').trim()) : '';
-    const url = `${targetUrl}${separator}action=read&tripName=${cleanName}&t=${Date.now()}`;
+    const url = `${targetUrl}${separator}action=read&tripName=${cleanName}&fileName=${cleanName}&t=${Date.now()}`;
     
     const response = await fetch(url);
     const result = await response.json();
