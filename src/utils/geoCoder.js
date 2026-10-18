@@ -29,17 +29,44 @@ export const saveDynamicGeoCache = (keyword, coords) => {
 const STOP_WORDS = new Set([
   '上午', '下午', '晚上', '早晨', '午餐', '晚餐', '抵達', '出發', '散策', 
   '搭乘', '前往', '辦理', '入住', '退房', '採買', '休息', '放鬆', '準備',
-  '預約', '自由活動', '拍照', '直達', '轉乘', '銜接', '時間', '班次', '備案'
+  '預約', '自由活動', '拍照', '直達', '轉乘', '銜接', '時間', '班次', '備案',
+  '普通', '快速', '特急', '新幹線', '專車', '巴士', '計程車', '跳表', '包車',
+  '直飛', '直航', '去程', '回程', '連泊', '雙人房', '和室', '大餐', '美食'
 ]);
 
-// 從一段隨意輸入的多行文字中，智慧擷取出潛在的地點名稱
+// 旅遊常用交通動詞與連接介詞正則 (用於切分航線與起訖點)
+const TRANSIT_VERBS_REGEX = /(?:飛往|飛到|飛|搭乘.*?至|搭乘.*?到|搭.*?至|搭.*?到|步行至|步行到|直奔|前往|抵達|銜接|轉乘至|轉乘到|返抵|返回|至|到|往|回|返|~|～|->|→)/g;
+
+// 地名實體特徵後綴 (常見旅遊地標、車站、景點、住宿)
+const LANDMARK_SUFFIX_REGEX = /([\u4e00-\u9fa5a-zA-Z0-9]{2,14}(?:機場|空港|車站|站|駅|飯店|酒店|旅館|溫泉|神社|大社|寺|城|山|湖|溪|谷|橋|高原|纜車|塔|市場|食堂|居酒屋|Outlet|廣場|公園|館|屋|店))/g;
+
+// 從一段隨意輸入的多行文字中，智慧擷取出所有潛在地點名稱
 export const extractLocationKeywords = (text) => {
   if (!text || typeof text !== 'string') return [];
 
-  const candidates = [];
-  // 1. 依行、分號、逗號、括號、箭頭切分 (連字號置於集合末尾，符合 ECMAScript 規範)
-  const segments = text
-    .replace(/->|→/g, '\n')
+  const foundSet = new Set();
+  const rawText = text.trim();
+
+  // 1. 第一層：掃描已知靜態地標庫 (按長度排序，優先匹配最完整地名)
+  const allKnownKeys = Object.keys(locationGeoCache).sort((a, b) => b.length - a.length);
+  for (const key of allKnownKeys) {
+    if (rawText.includes(key)) {
+      foundSet.add(key);
+    }
+  }
+
+  // 2. 第二層：掃描 LocalStorage 動態快取庫
+  const dynamicCache = getDynamicGeoCache();
+  const dynamicKeys = Object.keys(dynamicCache).sort((a, b) => b.length - a.length);
+  for (const key of dynamicKeys) {
+    if (rawText.includes(key)) {
+      foundSet.add(key);
+    }
+  }
+
+  // 3. 第三層：利用動詞切分長句，並利用後綴正則萃取潛在地點
+  const preprocessed = rawText.replace(TRANSIT_VERBS_REGEX, '\n');
+  const segments = preprocessed
     .split(/[\n;；,，+&＆/-]/)
     .map(s => s.trim())
     .filter(Boolean);
@@ -50,21 +77,43 @@ export const extractLocationKeywords = (text) => {
     if (/^\d+h\s*\d+m/i.test(seg)) continue;
     if (/^\d+m$/i.test(seg)) continue;
     if (/^\d+[円元分]/.test(seg)) continue;
-    if (seg.length < 2 || seg.length > 25) continue;
+    if (seg.length < 2 || seg.length > 30) continue;
 
-    // 清理括號與前綴
+    // 後綴特徵比對
+    let match;
+    const regexClone = new RegExp(LANDMARK_SUFFIX_REGEX);
+    while ((match = regexClone.exec(seg)) !== null) {
+      const candidate = match[1].trim();
+      if (!STOP_WORDS.has(candidate)) {
+        foundSet.add(candidate);
+      }
+    }
+
+    // 清理括號與前綴短詞
     let cleaned = seg.replace(/^[【\[(（].*?[】\])）]/g, '').trim();
     cleaned = cleaned.replace(/[【\[(（].*?[】\])）]$/g, '').trim();
-    // 移除常見動詞前綴
     cleaned = cleaned.replace(/^(前往|搭乘|抵達|遊覽|散策|參訪|至|在)\s*/g, '').trim();
 
-    if (cleaned.length >= 2 && !STOP_WORDS.has(cleaned)) {
-      candidates.push(cleaned);
+    if (cleaned.length >= 2 && cleaned.length <= 15 && !STOP_WORDS.has(cleaned) && !/^\d+/.test(cleaned)) {
+      foundSet.add(cleaned);
     }
   }
 
-  // 去重並回傳前 5 個最有潛力的候選地點
-  return Array.from(new Set(candidates)).slice(0, 5);
+  // 4. 清洗與過濾噪聲 (若集合中已存在「羽田機場」，過濾掉更長且帶噪聲的「羽田機場 18:25」)
+  const candidateList = Array.from(foundSet);
+  const cleanResults = candidateList.filter(item => {
+    // 檢查是否有另一個更高精確度的短地名被包含在此項目中且此項目包含數字/符號
+    for (const other of candidateList) {
+      if (other !== item && item.includes(other)) {
+        if (/\d+/.test(item) || item.length > other.length + 5) {
+          return false;
+        }
+      }
+    }
+    return true;
+  });
+
+  return cleanResults.slice(0, 10);
 };
 
 // 查詢單一地點座標（優先查靜態庫 -> 查 LocalStorage -> 線上 OpenStreetMap Nominatim）
@@ -74,22 +123,21 @@ export const resolveLocationCoords = async (rawKeyword) => {
 
   // 1. 查詢內建靜態快取
   for (const [key, coords] of Object.entries(locationGeoCache)) {
-    if (keyword.includes(key) || key.includes(keyword)) {
-      return { keyword, coords, source: 'static' };
+    if (keyword === key || keyword.includes(key) || key.includes(keyword)) {
+      return { keyword: key, coords, source: 'static' };
     }
   }
 
   // 2. 查詢 LocalStorage 動態快取
   const dynamicCache = getDynamicGeoCache();
   for (const [key, coords] of Object.entries(dynamicCache)) {
-    if (keyword.includes(key) || key.includes(keyword)) {
-      return { keyword, coords, source: 'cached' };
+    if (keyword === key || keyword.includes(key) || key.includes(keyword)) {
+      return { keyword: key, coords, source: 'cached' };
     }
   }
 
   // 3. 呼叫 OpenStreetMap Nominatim 進行動態線上地理編碼
   try {
-    // 加上 Japan 優先檢索提示（若包含日文或東北相關關鍵字）
     const query = encodeURIComponent(keyword);
     const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&accept-language=zh-TW,ja,en`;
 

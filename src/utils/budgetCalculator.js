@@ -197,9 +197,18 @@ export const calculateTripBudget = (trip) => {
   };
 };
 
-// 提取旅程中所有有效坐標供地圖繪製
+// 提取旅程中所有有效坐標供地圖繪製 (支援單欄位多地點如「松山機場飛羽田機場」與交通欄位)
 export const extractTripMapLocations = (trip, activeDayIndex = null) => {
   if (!trip || !trip.days) return [];
+
+  // 動態匯入或直接取 LocalStorage 快取
+  let dynamicCache = {};
+  try {
+    const dynamicSaved = localStorage.getItem('travel_planner_dynamic_geo_cache_v1');
+    if (dynamicSaved) {
+      dynamicCache = JSON.parse(dynamicSaved);
+    }
+  } catch (e) {}
 
   const locations = [];
   const daysToProcess = activeDayIndex !== null 
@@ -207,60 +216,109 @@ export const extractTripMapLocations = (trip, activeDayIndex = null) => {
     : trip.days;
 
   daysToProcess.forEach(day => {
+    // 納入交通起訖、各時段行程、餐飲與住宿
     const candidatePlaces = [
-      { name: day.morning?.location || day.morning?.details, period: '上午行程', time: '上午' },
-      { name: day.lunch?.location || day.lunch?.restaurant, period: '午餐', time: '中午' },
-      { name: day.afternoon?.location || day.afternoon?.details, period: '下午行程', time: '下午' },
-      { name: day.dinner?.location || day.dinner?.restaurant, period: '晚餐', time: '晚間' },
-      { name: day.evening?.location || day.evening?.details, period: '晚上行程', time: '夜間' },
+      { name: [day.transit?.details, day.transit?.trainCode].filter(Boolean).join(' '), period: '交通移動', time: '交通' },
+      { name: [day.morning?.location, day.morning?.details].filter(Boolean).join(' '), period: '上午行程', time: '上午' },
+      { name: [day.lunch?.location, day.lunch?.restaurant].filter(Boolean).join(' '), period: '午餐', time: '中午' },
+      { name: [day.afternoon?.location, day.afternoon?.details].filter(Boolean).join(' '), period: '下午行程', time: '下午' },
+      { name: [day.dinner?.location, day.dinner?.restaurant].filter(Boolean).join(' '), period: '晚餐', time: '晚間' },
+      { name: [day.evening?.location, day.evening?.details].filter(Boolean).join(' '), period: '晚上行程', time: '夜間' },
       { name: day.accommodation?.name, period: '夜間住宿', time: '過夜' }
     ];
 
-    candidatePlaces.forEach((item, idx) => {
-      if (!item.name) return;
+    const daySeenCoords = new Set();
 
-      // 在靜態快取庫與使用者動態快取庫中比對
-      let matchedCoord = null;
-      let matchedName = item.name;
+    candidatePlaces.forEach((item, slotIdx) => {
+      if (!item.name || typeof item.name !== 'string' || !item.name.trim()) return;
 
-      // 先查靜態庫
-      for (const [key, coords] of Object.entries(locationGeoCache)) {
-        if (item.name.includes(key) || key.includes(item.name)) {
-          matchedCoord = coords;
-          matchedName = key;
-          break;
+      const fullText = item.name.trim();
+      const extractedKeywords = [];
+
+      // 1. 先檢驗靜態庫與動態庫中是否有直接包含的地標
+      const allKnownKeys = [
+        ...Object.keys(locationGeoCache),
+        ...Object.keys(dynamicCache)
+      ].sort((a, b) => b.length - a.length);
+
+      for (const key of allKnownKeys) {
+        if (fullText.includes(key)) {
+          if (!extractedKeywords.includes(key)) {
+            extractedKeywords.push(key);
+          }
         }
       }
 
-      // 若未命中則查動態庫（來自 LocalStorage 或 OpenStreetMap 線上解析結果）
-      if (!matchedCoord) {
-        try {
-          const dynamicSaved = localStorage.getItem('travel_planner_dynamic_geo_cache_v1');
-          if (dynamicSaved) {
-            const dynamicCache = JSON.parse(dynamicSaved);
-            for (const [key, coords] of Object.entries(dynamicCache)) {
-              if (item.name.includes(key) || key.includes(item.name)) {
-                matchedCoord = coords;
-                matchedName = key;
-                break;
-              }
+      // 2. 若無已知地名，或文字中有交通動詞/連接詞，切分進行關鍵字萃取
+      const transitVerbs = /(?:飛往|飛到|飛|搭乘.*?至|搭乘.*?到|搭.*?至|搭.*?到|步行至|步行到|直奔|前往|抵達|銜接|轉乘至|轉乘到|返抵|返回|至|到|往|回|返|~|～|->|→)/g;
+      const landmarkSuffix = /([\u4e00-\u9fa5a-zA-Z0-9]{2,14}(?:機場|空港|車站|站|駅|飯店|酒店|旅館|溫泉|神社|大社|寺|城|山|湖|溪|谷|橋|高原|纜車|塔|市場|食堂|居酒屋|Outlet|廣場|公園|館|屋|店))/g;
+      
+      const segments = fullText.replace(transitVerbs, '\n').split(/[\n;；,，+&＆/-]/);
+      for (const seg of segments) {
+        const trimmed = seg.trim();
+        if (trimmed.length >= 2 && trimmed.length <= 20) {
+          let match;
+          const re = new RegExp(landmarkSuffix);
+          while ((match = re.exec(trimmed)) !== null) {
+            const cand = match[1].trim();
+            if (!extractedKeywords.includes(cand)) {
+              extractedKeywords.push(cand);
             }
           }
-        } catch (e) {}
+          if (trimmed.length <= 12 && !extractedKeywords.includes(trimmed)) {
+            extractedKeywords.push(trimmed);
+          }
+        }
       }
 
-      if (matchedCoord) {
-        locations.push({
-          id: `day-${day.dayIndex}-${idx}-${matchedName}`,
-          dayIndex: day.dayIndex,
-          date: day.date,
-          name: matchedName || item.name,
-          rawText: item.name,
-          period: item.period,
-          lat: matchedCoord[0],
-          lng: matchedCoord[1]
-        });
+      // 如果完全沒切出關鍵字，保底用原始文字
+      if (extractedKeywords.length === 0) {
+        extractedKeywords.push(fullText);
       }
+
+      // 3. 逐一比對每個候選地點並加入 locations
+      extractedKeywords.forEach((kw, kwIdx) => {
+        let matchedCoord = null;
+        let matchedName = kw;
+
+        // 查靜態庫
+        for (const [k, coords] of Object.entries(locationGeoCache)) {
+          if (kw === k || kw.includes(k) || k.includes(kw)) {
+            matchedCoord = coords;
+            matchedName = k;
+            break;
+          }
+        }
+
+        // 查動態庫
+        if (!matchedCoord) {
+          for (const [k, coords] of Object.entries(dynamicCache)) {
+            if (kw === k || kw.includes(k) || k.includes(kw)) {
+              matchedCoord = coords;
+              matchedName = k;
+              break;
+            }
+          }
+        }
+
+        if (matchedCoord) {
+          const coordKey = `${matchedCoord[0].toFixed(4)},${matchedCoord[1].toFixed(4)}`;
+          // 避免同一天重複推入一模一樣的坐標
+          if (!daySeenCoords.has(coordKey)) {
+            daySeenCoords.add(coordKey);
+            locations.push({
+              id: `day-${day.dayIndex}-${slotIdx}-${kwIdx}-${matchedName}`,
+              dayIndex: day.dayIndex,
+              date: day.date,
+              name: matchedName,
+              rawText: fullText,
+              period: item.period,
+              lat: matchedCoord[0],
+              lng: matchedCoord[1]
+            });
+          }
+        }
+      });
     });
   });
 

@@ -76,7 +76,8 @@ export default function LeafletMapVisualizer({ trip, activeDayIndex, onCloseMap 
         day.dinner?.location, day.dinner?.restaurant,
         day.evening?.location, day.evening?.details,
         day.accommodation?.name,
-        day.transit?.details
+        day.transit?.details,
+        day.transit?.trainCode
       ].filter(Boolean);
 
       texts.forEach(txt => {
