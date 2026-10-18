@@ -219,21 +219,43 @@ export const extractTripMapLocations = (trip, activeDayIndex = null) => {
     candidatePlaces.forEach((item, idx) => {
       if (!item.name) return;
 
-      // 在快取庫中比對
+      // 在靜態快取庫與使用者動態快取庫中比對
       let matchedCoord = null;
+      let matchedName = item.name;
+
+      // 先查靜態庫
       for (const [key, coords] of Object.entries(locationGeoCache)) {
         if (item.name.includes(key) || key.includes(item.name)) {
           matchedCoord = coords;
+          matchedName = key;
           break;
         }
       }
 
+      // 若未命中則查動態庫（來自 LocalStorage 或 OpenStreetMap 線上解析結果）
+      if (!matchedCoord) {
+        try {
+          const dynamicSaved = localStorage.getItem('travel_planner_dynamic_geo_cache_v1');
+          if (dynamicSaved) {
+            const dynamicCache = JSON.parse(dynamicSaved);
+            for (const [key, coords] of Object.entries(dynamicCache)) {
+              if (item.name.includes(key) || key.includes(item.name)) {
+                matchedCoord = coords;
+                matchedName = key;
+                break;
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
       if (matchedCoord) {
         locations.push({
-          id: `day-${day.dayIndex}-${idx}`,
+          id: `day-${day.dayIndex}-${idx}-${matchedName}`,
           dayIndex: day.dayIndex,
           date: day.date,
-          name: item.name,
+          name: matchedName || item.name,
+          rawText: item.name,
           period: item.period,
           lat: matchedCoord[0],
           lng: matchedCoord[1]

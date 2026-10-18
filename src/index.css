@@ -2044,5 +2044,156 @@ body {
   line-height: 1.5;
 }
 
+/* ==========================================================================
+   天數順序調整 (Drag & Drop, Move Up/Down, Insert) 樣式
+   ========================================================================== */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: grab;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.drag-handle:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.day-action-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-icon.order-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.btn-icon.order-btn:hover:not(:disabled) {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.btn-icon.order-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.btn-icon.insert-day-btn {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #34d399;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.btn-icon.insert-day-btn:hover {
+  background: rgba(52, 211, 153, 0.18);
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   地圖地點即時搜尋與自動偵測指示器樣式
+   ========================================================================== */
+.auto-detect-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 20px;
+  padding: 2px 8px;
+  animation: pulseFade 2s infinite ease-in-out;
+}
+
+.map-search-bar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.search-input-group {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-group .search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-secondary);
+}
+
+.map-search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  padding: 6px 10px 6px 30px;
+  font-size: 0.8rem;
+  color: white;
+  outline: none;
+}
+
+.map-search-input:focus {
+  border-color: #38bdf8;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.map-search-submit {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+}
+
+.search-error-toast {
+  padding: 6px 14px;
+  background: rgba(239, 68, 68, 0.15);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 0.76rem;
+}
+
+.popup-raw-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+@keyframes pulseFade {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+
 
 

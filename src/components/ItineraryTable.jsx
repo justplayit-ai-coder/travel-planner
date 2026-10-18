@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Calendar, 
   Train, 
@@ -9,7 +9,11 @@ import {
   Hotel, 
   Receipt, 
   Plus, 
-  Trash2
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  GripVertical,
+  PlusCircle
 } from 'lucide-react';
 import { convertItemToTWD } from '../utils/budgetCalculator';
 
@@ -21,6 +25,7 @@ export default function ItineraryTable({
 }) {
   const currencyName = trip.currencyName || 'JPY';
   const exchangeRate = trip.exchangeRate || 0.205;
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   // 規範外幣代碼：若不是 TWD 則一律以目前頂部選定的主要外幣為依據
   const getNormalizedCurrency = (cur) => {
@@ -47,7 +52,6 @@ export default function ItineraryTable({
     if (!sec) return '';
     if (sec.details !== undefined && sec.details !== '') return sec.details;
     if (sec.notes !== undefined && sec.notes !== '') return sec.notes;
-    // 將舊欄位內容組合成清晰多行字串
     const parts = defaultFields.map(f => sec[f]).filter(Boolean);
     return parts.join('\n');
   };
@@ -61,22 +65,97 @@ export default function ItineraryTable({
     onUpdateTrip({ ...trip, days: updatedDays });
   };
 
-  // 新增一天
+  // 建立全新的一天空白資料結構
+  const createBlankDay = (index) => ({
+    dayIndex: index,
+    date: `Day ${index}`,
+    transit: { details: '', expenseAmount: 0, currency: currencyName },
+    morning: { details: '', expenseAmount: 0, currency: currencyName },
+    lunch: { details: '', expenseAmount: 0, currency: currencyName },
+    afternoon: { details: '', expenseAmount: 0, currency: currencyName },
+    dinner: { details: '', expenseAmount: 0, currency: currencyName },
+    evening: { details: '', expenseAmount: 0, currency: currencyName },
+    accommodation: { details: '', expenseAmount: 0, currency: currencyName },
+    miscellaneous: { details: '', expenseAmount: 0, currency: currencyName }
+  });
+
+  // 在尾部新增一天
   const handleAddDay = () => {
     const nextIndex = (trip.days?.length || 0) + 1;
-    const newDay = {
-      dayIndex: nextIndex,
-      date: `Day ${nextIndex}`,
-      transit: { details: '', expenseAmount: 0, currency: currencyName },
-      morning: { details: '', expenseAmount: 0, currency: currencyName },
-      lunch: { details: '', expenseAmount: 0, currency: currencyName },
-      afternoon: { details: '', expenseAmount: 0, currency: currencyName },
-      dinner: { details: '', expenseAmount: 0, currency: currencyName },
-      evening: { details: '', expenseAmount: 0, currency: currencyName },
-      accommodation: { details: '', expenseAmount: 0, currency: currencyName },
-      miscellaneous: { details: '', expenseAmount: 0, currency: currencyName }
-    };
+    const newDay = createBlankDay(nextIndex);
     onUpdateTrip({ ...trip, days: [...(trip.days || []), newDay] });
+  };
+
+  // 在指定天數之後插入新的一天
+  const handleInsertDayAfter = (currentDayIndex) => {
+    const currentDays = [...(trip.days || [])];
+    const targetIdx = currentDays.findIndex(d => d.dayIndex === currentDayIndex);
+    if (targetIdx === -1) return;
+
+    const newDay = createBlankDay(currentDayIndex + 1);
+    currentDays.splice(targetIdx + 1, 0, newDay);
+
+    // 重新排序全體 dayIndex
+    const reindexedDays = currentDays.map((d, idx) => ({
+      ...d,
+      dayIndex: idx + 1
+    }));
+
+    onUpdateTrip({ ...trip, days: reindexedDays });
+  };
+
+  // 調整天數順序 (向上或向下移動)
+  const handleMoveDay = (currentIndex, direction) => {
+    const days = [...(trip.days || [])];
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= days.length) return;
+
+    // 交換位置
+    const temp = days[currentIndex];
+    days[currentIndex] = days[targetIndex];
+    days[targetIndex] = temp;
+
+    // 重新編號所有天的 dayIndex
+    const reindexed = days.map((d, idx) => ({
+      ...d,
+      dayIndex: idx + 1
+    }));
+
+    onUpdateTrip({ ...trip, days: reindexed });
+    if (onSelectDay) {
+      onSelectDay(targetIndex + 1);
+    }
+  };
+
+  // 拖曳排序事件處理
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, targetIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+    const days = [...(trip.days || [])];
+    const [draggedDay] = days.splice(draggedIndex, 1);
+    days.splice(targetIndex, 0, draggedDay);
+
+    const reindexed = days.map((d, idx) => ({
+      ...d,
+      dayIndex: idx + 1
+    }));
+
+    setDraggedIndex(null);
+    onUpdateTrip({ ...trip, days: reindexed });
+    if (onSelectDay) {
+      onSelectDay(targetIndex + 1);
+    }
   };
 
   // 刪除一天
@@ -108,8 +187,10 @@ export default function ItineraryTable({
 
       {/* 每日卡片列表 */}
       <div className="days-wrapper">
-        {(trip.days || []).map((day) => {
+        {(trip.days || []).map((day, index) => {
           const isSelected = activeDayIndex === day.dayIndex;
+          const isFirstDay = index === 0;
+          const isLastDay = index === (trip.days?.length || 0) - 1;
 
           // 計算當天總開銷折合台幣
           const dayExpenses = [
@@ -129,10 +210,20 @@ export default function ItineraryTable({
               key={day.dayIndex} 
               className={`day-card ${isSelected ? 'active-day-focus' : ''}`}
               onClick={() => onSelectDay && onSelectDay(day.dayIndex)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
             >
-              {/* Day Header 頂部列：花費往左靠留空 10 字元，刪除 icon 靠最右切齊 */}
+              {/* Day Header 頂部列：支援順序調整、中間插入與拖曳握把 */}
               <div className="day-card-header compact-day-header">
                 <div className="day-header-left">
+                  <div 
+                    className="drag-handle" 
+                    draggable 
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    title="按住拖曳可調整天數順序"
+                  >
+                    <GripVertical size={16} />
+                  </div>
                   <div className="day-badge-wrap">
                     <span className="day-badge">Day {day.dayIndex}</span>
                     <input
@@ -149,7 +240,46 @@ export default function ItineraryTable({
                   </div>
                 </div>
 
-                <div className="day-header-right-action">
+                <div className="day-header-right-action day-action-btn-group">
+                  {/* 向上移動按鈕 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMoveDay(index, 'up');
+                    }}
+                    disabled={isFirstDay}
+                    className="btn-icon order-btn"
+                    title={isFirstDay ? '已是第一天' : '向前移動一天'}
+                  >
+                    <ArrowUp size={14} />
+                  </button>
+
+                  {/* 向下移動按鈕 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMoveDay(index, 'down');
+                    }}
+                    disabled={isLastDay}
+                    className="btn-icon order-btn"
+                    title={isLastDay ? '已是最後一天' : '向後移動一天'}
+                  >
+                    <ArrowDown size={14} />
+                  </button>
+
+                  {/* 在此天後插入新的一天按鈕 */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleInsertDayAfter(day.dayIndex);
+                    }}
+                    className="btn-icon insert-day-btn"
+                    title="在此天後插入新的一天"
+                  >
+                    <PlusCircle size={15} />
+                  </button>
+
+                  {/* 刪除此天按鈕 */}
                   {trip.days.length > 1 && (
                     <button
                       onClick={(e) => {
